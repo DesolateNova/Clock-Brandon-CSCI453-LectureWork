@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      manBrown_gun_0: 5542786168298760869
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

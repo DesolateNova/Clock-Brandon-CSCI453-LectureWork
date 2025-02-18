@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      womanGreen_gun_0: -5700380954430505403
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

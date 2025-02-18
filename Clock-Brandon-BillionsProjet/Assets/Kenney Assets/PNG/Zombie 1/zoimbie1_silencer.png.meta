@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      zoimbie1_silencer_0: 7693742108869173356
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

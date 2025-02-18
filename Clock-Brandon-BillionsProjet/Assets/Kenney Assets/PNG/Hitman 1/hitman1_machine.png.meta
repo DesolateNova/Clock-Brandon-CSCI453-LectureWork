@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      hitman1_machine_0: 5909660651913137592
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

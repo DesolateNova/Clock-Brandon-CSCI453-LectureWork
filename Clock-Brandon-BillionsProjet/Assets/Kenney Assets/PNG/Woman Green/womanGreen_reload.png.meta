@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      womanGreen_reload_0: -4645674036854885354
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

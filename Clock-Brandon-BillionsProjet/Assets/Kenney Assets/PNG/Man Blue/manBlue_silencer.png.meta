@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      manBlue_silencer_0: -7599553732540998545
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

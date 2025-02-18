@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      womanGreen_silencer_0: -6265298338568381273
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

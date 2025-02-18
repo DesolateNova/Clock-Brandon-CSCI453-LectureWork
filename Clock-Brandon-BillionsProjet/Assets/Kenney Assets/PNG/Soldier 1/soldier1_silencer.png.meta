@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      soldier1_silencer_0: -3705317591603817619
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
