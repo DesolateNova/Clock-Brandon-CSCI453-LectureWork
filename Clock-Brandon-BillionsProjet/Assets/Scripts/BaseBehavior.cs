@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class BaseBehavior : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class BaseBehavior : MonoBehaviour
     [SerializeField] private int reserves;
     [SerializeField] private GameObject spawnling;
     [SerializeField] private float spawnTime;
+
+
+    private Dictionary<int, Vector3> wayPoints = new Dictionary<int, Vector3>();
+
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -27,7 +32,6 @@ public class BaseBehavior : MonoBehaviour
         float angle = Mathf.Atan2(arenaCenterPos.y, arenaCenterPos.x) * Mathf.Rad2Deg - 90;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
 
-
     }
 
     // Update is called once per frame
@@ -39,14 +43,21 @@ public class BaseBehavior : MonoBehaviour
             Spawn();
             timer = spawnTime;
         }
+
+
+
     }
 
     private string GetBaseColor(string baseName)
     {
         if (baseName == "GreenBase")
             return "Green";
-        else
+        else if (baseName == "YellowBase")
             return "Yellow";
+        else if (baseName == "BlueBase")
+            return "Blue";
+        else
+            return "Red";
     }
 
     private float GetDiameter(GameObject item)
@@ -62,6 +73,11 @@ public class BaseBehavior : MonoBehaviour
             spawn.GetComponent<SpriteRenderer>().color = Color.green;
         else if (color == "Yellow")
             spawn.GetComponent<SpriteRenderer>().color = Color.yellow;
+        else if (color == "Red")
+            spawn.GetComponent<SpriteRenderer>().color = Color.red;
+        else if (color == "Blue")
+            spawn.GetComponent<SpriteRenderer>().color = Color.blue;
+
         reserves--;
     }
 

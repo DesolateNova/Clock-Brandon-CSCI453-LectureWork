@@ -5,11 +5,14 @@ public class BillionsBehavior : MonoBehaviour
 
     private float colliderRadius;
     private Collider2D[] result;
+    private Color color;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         colliderRadius = gameObject.GetComponent<CircleCollider2D>().radius;
+        color = GetComponent<SpriteRenderer>().color;
+        Debug.Log(GameManager.GetColor(color));
     }
 
     // Update is called once per frame
