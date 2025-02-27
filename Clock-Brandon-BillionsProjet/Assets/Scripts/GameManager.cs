@@ -37,10 +37,6 @@ public class GameManager : MonoBehaviour
     void Update()
     {
 
-        //Get and maintain mouse position
-        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = 0;
-        Debug.Log("Current Mouse Pos: " + mousePosition);
     }
 
     public static string GetColor(Color objectColor)
