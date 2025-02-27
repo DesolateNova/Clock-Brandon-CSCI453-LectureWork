@@ -509,6 +509,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1356131058}
   - component: {fileID: 1356131059}
+  - component: {fileID: 1356131060}
   m_Layer: 0
   m_Name: ArenaCenter
   m_TagString: Untagged
@@ -541,6 +542,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d39e74614b5fe44798d2677c46014cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1356131060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1356131057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f8088a08539c54458b62101c7ccb8c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1376604856
