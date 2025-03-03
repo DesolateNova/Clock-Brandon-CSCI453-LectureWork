@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5201798159895479366}
   - component: {fileID: 8275652821628498114}
   m_Layer: 0
-  m_Name: RedFlag
+  m_Name: Flag_R
   m_TagString: Waypoint
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

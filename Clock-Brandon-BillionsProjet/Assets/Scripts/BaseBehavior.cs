@@ -22,7 +22,7 @@ public class BaseBehavior : MonoBehaviour
     void Start()
     {
         //Get relevant data for variables
-        baseColor = GetBaseColor(this.gameObject.name);
+        baseColor = GameManager.GetColor(gameObject);
         baseDiameter = GetDiameter(this.gameObject);
         spawnlingDiameter = GetDiameter(spawnling);
         timer = spawnTime;
@@ -31,7 +31,7 @@ public class BaseBehavior : MonoBehaviour
         arenaCenterPos = GameObject.Find("ArenaCenter").transform.position - transform.position;
         float angle = Mathf.Atan2(arenaCenterPos.y, arenaCenterPos.x) * Mathf.Rad2Deg - 90;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
-
+        Debug.Log(GameManager.GetColor(gameObject) + " Base, Reporting for Duty!");
     }
 
     // Update is called once per frame
@@ -43,21 +43,6 @@ public class BaseBehavior : MonoBehaviour
             Spawn();
             timer = spawnTime;
         }
-
-
-
-    }
-
-    private string GetBaseColor(string baseName)
-    {
-        if (baseName == "GreenBase")
-            return "Green";
-        else if (baseName == "YellowBase")
-            return "Yellow";
-        else if (baseName == "BlueBase")
-            return "Blue";
-        else
-            return "Red";
     }
 
     private float GetDiameter(GameObject item)
@@ -68,7 +53,7 @@ public class BaseBehavior : MonoBehaviour
     private void Spawn()
     {
         GameObject spawn = Instantiate(spawnling, transform.position + transform.up, transform.rotation);
-        string color = GetBaseColor(gameObject.name);
+        string color = GameManager.GetColor(gameObject);
         if (color == "Green")
             spawn.GetComponent<SpriteRenderer>().color = Color.green;
         else if (color == "Yellow")

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7647025218369817477}
   - component: {fileID: -3615289260643361762}
   m_Layer: 0
-  m_Name: GreenBase
+  m_Name: Base_G
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

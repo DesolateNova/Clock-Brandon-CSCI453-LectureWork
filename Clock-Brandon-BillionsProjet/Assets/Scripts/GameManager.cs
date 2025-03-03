@@ -13,6 +13,12 @@ public class GameManager : MonoBehaviour
     private static KeyValuePair<Color, string> blue = new KeyValuePair<Color, string>(Color.blue, "Blue");
     private static KeyValuePair<Color, string> yellow = new KeyValuePair<Color, string>(Color.yellow, "Yellow");
     private static KeyValuePair<Color, string> green = new KeyValuePair<Color, string>(Color.green, "Green");
+    private GameObject mousePointer;
+
+
+
+    public static bool greenCapped, yellowCapped, redCapped, blueCapped;
+    public static Vector3 mousePosition;
 
 
     //Singleton creation
@@ -27,20 +33,47 @@ public class GameManager : MonoBehaviour
         instance = this;
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        mousePointer = Resources.Load<GameObject>("Prefabs/MousePointer");
+        mousePointer = Instantiate(mousePointer, Vector3.zero, Quaternion.identity);
+        mousePointer.name = "MousePointer";
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        SetMousePos();
+        GameObject nearestBase = ProxyManager.GetNearestBase(mousePointer);
+        Debug.Log("Nearest Base: " + nearestBase.name);
     }
 
-    public static string GetColor(Color objectColor)
+    private void SetMousePos()
     {
+        //Get and maintain mouse position mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = 0;
+        mousePointer.transform.position = mousePosition;
+    }
+
+    public static Vector3 ReportMousePos()
+    {
+        return mousePosition;
+    }
+
+    public static string GetColor(GameObject item)
+    {
+        string postFix = item.name.Substring(item.name.Length - 2);
+        if (postFix == "_G")
+            return "Green";
+        else if (postFix == "_Y")
+            return "Yellow";
+        else if (postFix == "_B")
+            return "Blue";
+        else if (postFix == "_R")
+            return "Red";
+
+        Color objectColor = item.GetComponent<SpriteRenderer>().color;
         if (objectColor == red.Key)
             return red.Value;
         else if (objectColor == yellow.Key)
@@ -49,9 +82,8 @@ public class GameManager : MonoBehaviour
             return green.Value;
         else if (objectColor == blue.Key)
             return blue.Value;
+
         else return "Unknown Color";
-             
+        
     }
-
-
 }

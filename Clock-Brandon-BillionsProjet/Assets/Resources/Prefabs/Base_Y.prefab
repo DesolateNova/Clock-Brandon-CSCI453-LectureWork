@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8979102264320299177}
   - component: {fileID: 3683618389422993939}
   m_Layer: 0
-  m_Name: YellowBase
+  m_Name: Base_Y
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
