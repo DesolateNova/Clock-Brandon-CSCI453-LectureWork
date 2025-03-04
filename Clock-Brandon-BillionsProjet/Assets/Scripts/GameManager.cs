@@ -13,11 +13,10 @@ public class GameManager : MonoBehaviour
     private static KeyValuePair<Color, string> blue = new KeyValuePair<Color, string>(Color.blue, "Blue");
     private static KeyValuePair<Color, string> yellow = new KeyValuePair<Color, string>(Color.yellow, "Yellow");
     private static KeyValuePair<Color, string> green = new KeyValuePair<Color, string>(Color.green, "Green");
-    private GameObject mousePointer;
+    public static GameObject mousePointer;
 
 
 
-    public static bool greenCapped, yellowCapped, redCapped, blueCapped;
     public static Vector3 mousePosition;
 
 
@@ -44,8 +43,6 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         SetMousePos();
-        GameObject nearestBase = ProxyManager.GetNearestBase(mousePointer);
-        Debug.Log("Nearest Base: " + nearestBase.name);
     }
 
     private void SetMousePos()

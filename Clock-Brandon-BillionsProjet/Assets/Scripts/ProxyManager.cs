@@ -56,6 +56,9 @@ public class ProxyManager :  MonoBehaviour {
         {
             foreach (GameObject obj in relevantObjects[catagory])
             {
+                if (obj.tag == "PlayerBase")
+                    continue;
+
                 if (Vector3.Distance(GameManager.mousePosition, obj.transform.position) < Vector3.Distance(GameManager.mousePosition, closestVector))
                 {
                     closestVector = obj.transform.position;
@@ -74,6 +77,9 @@ public class ProxyManager :  MonoBehaviour {
 
         foreach (GameObject obj in relevantObjects[color])
         {
+            if (obj.tag == "PlayerBase")
+                continue;
+
             if (Vector3.Distance(GameManager.mousePosition, obj.transform.position) < Vector3.Distance(GameManager.mousePosition, closestVector))
             {
                 closestVector = obj.transform.position;
@@ -90,5 +96,10 @@ public class ProxyManager :  MonoBehaviour {
         GetNearestRelevantObject(category);
     }
 
+    public static void AddToSide(string playersSide, GameObject obj) 
+    {
+        if (!relevantObjects[playersSide].Contains(obj))
+            relevantObjects[playersSide].AddLast(obj);
+    }
 
 }
