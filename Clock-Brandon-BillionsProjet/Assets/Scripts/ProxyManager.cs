@@ -6,6 +6,7 @@ public class ProxyManager :  MonoBehaviour {
     public ProxyManager instance { get; set; }
 
     private static Dictionary<string, LinkedList<GameObject>> relevantObjects = new Dictionary<string, LinkedList<GameObject>>();
+    public static Dictionary<string, LinkedList<GameObject>> worldSpawnlings = new Dictionary<string, LinkedList<GameObject>>();
     private static BaseBehavior[] startingBases;
     public void Awake()
     {
@@ -21,11 +22,13 @@ public class ProxyManager :  MonoBehaviour {
     public void Start()
     {
         startingBases = GameObject.FindObjectsByType<BaseBehavior>(FindObjectsSortMode.None);
+
         foreach (BaseBehavior b in startingBases)
         {
             relevantObjects[GameManager.GetColor(b.gameObject)] = new LinkedList<GameObject>();
             relevantObjects[GameManager.GetColor(b.gameObject)].AddLast(b.gameObject);
         }
+        worldSpawnlings = new Dictionary<string, LinkedList<GameObject>>();
     }
 
     public static GameObject GetNearestBase(GameObject subject)
@@ -98,8 +101,17 @@ public class ProxyManager :  MonoBehaviour {
 
     public static void AddToSide(string playersSide, GameObject obj) 
     {
-        if (!relevantObjects[playersSide].Contains(obj))
+        if (!relevantObjects[playersSide].Contains(obj) && obj.tag == "Waypoint")
+        {
             relevantObjects[playersSide].AddLast(obj);
+            Debug.Log("RelObj: " + relevantObjects[playersSide].Count);
+        }
+
+        if (!worldSpawnlings[playersSide].Contains(obj) && obj.tag == "Spawnling")
+        {
+            worldSpawnlings[playersSide].AddLast(obj);
+            Debug.Log("WS: " +worldSpawnlings[playersSide].Count);
+        }
     }
 
 }

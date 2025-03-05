@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - Waypoint
+  - PlayerBase
+  - Spawnling
   layers:
   - Default
   - TransparentFX

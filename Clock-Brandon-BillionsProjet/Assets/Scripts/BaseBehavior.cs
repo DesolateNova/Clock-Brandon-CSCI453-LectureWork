@@ -5,6 +5,7 @@ public class BaseBehavior : MonoBehaviour
 {
     private string baseColor;
     private Vector3 arenaCenterPos;
+    public Vector3 radius;
     private float baseDiameter;
     private float spawnlingDiameter;
     private float timer;
@@ -12,11 +13,6 @@ public class BaseBehavior : MonoBehaviour
     [SerializeField] private int reserves;
     [SerializeField] private GameObject spawnling;
     [SerializeField] private float spawnTime;
-
-
-    private Dictionary<int, Vector3> wayPoints = new Dictionary<int, Vector3>();
-
-
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -26,6 +22,9 @@ public class BaseBehavior : MonoBehaviour
         baseDiameter = GetDiameter(this.gameObject);
         spawnlingDiameter = GetDiameter(spawnling);
         timer = spawnTime;
+
+        //Establish bases radius
+        radius = transform.position.normalized * baseDiameter;
 
         //Angle Base towards center of arena
         arenaCenterPos = GameObject.Find("ArenaCenter").transform.position - transform.position;
@@ -63,9 +62,24 @@ public class BaseBehavior : MonoBehaviour
         else if (color == "Blue")
             spawn.GetComponent<SpriteRenderer>().color = Color.blue;
 
+        if (!ProxyManager.worldSpawnlings.ContainsKey(color))
+            ProxyManager.worldSpawnlings[color] = new LinkedList<GameObject>();
+        ProxyManager.AddToSide(color, spawn);
+        Debug.Log("Color: " + color);
+        Debug.Log("GameObject: " + spawn.name);
         reserves--;
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        string owner = GameManager.GetColor(collision.gameObject);
+        if (ProxyManager.worldSpawnlings.ContainsKey(owner) && ProxyManager.worldSpawnlings[owner].Contains(collision.gameObject))
+        {
+            Vector3 direction = (collision.transform.position - this.transform.position).normalized;
+            collision.transform.position += direction;
+        }
+
+    }
 
 
 

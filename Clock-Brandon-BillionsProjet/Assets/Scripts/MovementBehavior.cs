@@ -12,7 +12,6 @@ public class MovementBehavior : MonoBehaviour
     private static int nGreen = 0, nYellow = 0, nBlue = 0, nRed = 0;
 
     private GameObject selectedObject;
-    private bool mouseButton0Held;
     private float timer, clickDelay;
     private LineRenderer traceLine;
 
@@ -37,7 +36,6 @@ public class MovementBehavior : MonoBehaviour
         blueFlag = Resources.Load<GameObject>("Prefabs/Flag_B");
         greenFlag = Resources.Load<GameObject>("Prefabs/Flag_G");
         yellowFlag = Resources.Load<GameObject>("Prefabs/Flag_Y");
-        mouseButton0Held = false;
         timer = clickDelay;
     }
 
@@ -65,7 +63,6 @@ public class MovementBehavior : MonoBehaviour
         if (Input.GetAxis("Mouse0") == 1)
         {
             timer -= Time.deltaTime;
-            Debug.Log(timer);
             if (timer >= 0f)
             {
                 string flagOwner;
