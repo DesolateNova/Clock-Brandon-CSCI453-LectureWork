@@ -2,13 +2,17 @@ using UnityEngine;
 
 public class BillionsBehavior : MonoBehaviour
 {
+
+    [SerializeField] float movementSpeed;
     private static int billionNumber;
+
+
     public float billionRadius;
     private Transform myPos;
     private string color;
 
     private bool atWaypoint;
-    private bool packLeader;
+    private bool firstMove;
     private Waypoint waypoint;
 
 
@@ -22,6 +26,7 @@ public class BillionsBehavior : MonoBehaviour
         billionNumber++;
         myPos = transform;
         atWaypoint = false;
+        firstMove = true;
     }
 
     // Update is called once per frame
@@ -126,7 +131,6 @@ public class BillionsBehavior : MonoBehaviour
         float angle = Mathf.Atan2(location.transform.position.x, location.transform.position.y) * Mathf.Rad2Deg - 90;
         Vector3 direction = location.transform.position - transform.position;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
-
 
         if (Vector3.Distance(location.transform.position, myPos.position) > billionRadius)
             transform.position += direction.normalized * Time.deltaTime;
