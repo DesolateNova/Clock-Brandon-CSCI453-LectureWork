@@ -33,13 +33,10 @@ public class BillionsBehavior : MonoBehaviour
         if (nearestWaypoint != null)
             waypoint = nearestWaypoint.GetComponent<Waypoint>();
 
-        if (atWaypoint)
+        if (waypoint != null && !waypoint.HasPackLeader())
             atWaypoint = waypoint.HasPackLeader();
 
-
-
-
-        if (waypoint != null && nearestWaypoint != null)
+        if (waypoint != null && atWaypoint == false)
             MoveTowards(nearestWaypoint);
 
     }
@@ -129,7 +126,7 @@ public class BillionsBehavior : MonoBehaviour
 
         if (Vector3.Distance(location.transform.position, myPos.position) > billionRadius)
             transform.position += direction.normalized * Time.deltaTime;
-        else if (myPos.position == location.transform.position)
+        else if (Vector3.Distance(location.transform.position, myPos.position) < billionRadius)
         {
             waypoint.MakePackLeader(gameObject);
             atWaypoint = true;
@@ -145,6 +142,7 @@ public class BillionsBehavior : MonoBehaviour
         if (other.gameObject.CompareTag("Spawnling") && GameManager.GetColor(other.gameObject) == color && waypoint.HasPackLeader())
         {
             BillionsBehavior otherBillion = other.GetComponent<BillionsBehavior>();
+            atWaypoint = otherBillion.atWaypoint;
         }
     }
 }
