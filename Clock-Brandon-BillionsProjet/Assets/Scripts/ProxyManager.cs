@@ -73,7 +73,7 @@ public class ProxyManager :  MonoBehaviour {
         return closestObj;
     }
 
-    public static GameObject GetNearestRelevantObject(string color)
+    public static GameObject GetNearestRelevantObject(GameObject subject, string color)
     {
         Vector3 closestVector = new Vector3(int.MaxValue, int.MaxValue,int.MaxValue);
         GameObject closestObj = null;
@@ -83,20 +83,13 @@ public class ProxyManager :  MonoBehaviour {
             if (obj.tag == "PlayerBase")
                 continue;
 
-            if (Vector3.Distance(GameManager.mousePosition, obj.transform.position) < Vector3.Distance(GameManager.mousePosition, closestVector))
+            if (Vector3.Distance(subject.transform.position, obj.transform.position) < Vector3.Distance(subject.transform.position, closestVector))
             {
                 closestVector = obj.transform.position;
                 closestObj = obj;
             }
         }
         return closestObj;
-    }
-
-    public static void GetNearestRelevantObject(GameObject subject)
-    {
-
-        string category = GameManager.GetColor(subject);
-        GetNearestRelevantObject(category);
     }
 
     public static void AddToSide(string playersSide, GameObject obj) 

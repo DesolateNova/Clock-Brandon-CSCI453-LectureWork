@@ -2,11 +2,12 @@ using UnityEngine;
 
 public class BillionsBehavior : MonoBehaviour
 {
-    private static GameObject pointTesterPrefab;
     private static int billionNumber;
     private float billionRadius;
     private Transform myPos;
     private string color;
+
+    public bool atWaypoint;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -17,7 +18,7 @@ public class BillionsBehavior : MonoBehaviour
         name = "Team " + color + " Billion Unit " + billionNumber;
         billionNumber++;
         myPos = transform;
-        //Debug.Log(GameManager.GetColor(gameObject));
+        atWaypoint = false;
     }
 
     // Update is called once per frame
@@ -26,8 +27,10 @@ public class BillionsBehavior : MonoBehaviour
         if (ProxyManager.worldSpawnlings[color] != null && ProxyManager.worldSpawnlings[color].Count > 1)
             positionAdjuster();
 
-        GameObject nearestWaypoint = ProxyManager.GetNearestRelevantObject(color);
-        //MoveTowards(nearestWaypoint);
+        GameObject nearestWaypoint = ProxyManager.GetNearestRelevantObject(gameObject, color);
+
+        if (nearestWaypoint != null && !atWaypoint)
+            MoveTowards(nearestWaypoint);
 
     }
 
@@ -104,11 +107,34 @@ public class BillionsBehavior : MonoBehaviour
                 else if (distanceFromOtherPoint < billionRadius)
                 {
                     Vector3 direction = (new Vector3(xOffset, yOffset, 0f) + directionTo).normalized;
-                    Vector3 oldPos = billion.transform.position;
                     billion.transform.position += (direction * overlap) * billionRadius;
                     return;
                 }
             }
         }
     }
+
+    private void MoveTowards(GameObject location)
+    {
+        float angle = Mathf.Atan2(location.transform.position.x, location.transform.position.y) * Mathf.Rad2Deg - 90;
+        Vector3 direction = location.transform.position - transform.position;
+        transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        if (transform.position != location.transform.position)
+            transform.position += direction.normalized * Time.deltaTime;
+        else if (Vector3.Distance(transform.position, location.transform.position) < billionRadius / 4f)
+            atWaypoint = true;
+    }
+
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Spawnling"))
+        {
+            BillionsBehavior otherBillion = other.GetComponent<BillionsBehavior>();
+            if (atWaypoint && otherBillion.color == color)
+            {
+                otherBillion.atWaypoint = true;
+            }
+        }
+    }
+
 }

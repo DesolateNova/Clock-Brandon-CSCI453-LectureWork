@@ -5,9 +5,7 @@ public class BaseBehavior : MonoBehaviour
 {
     private string baseColor;
     private Vector3 arenaCenterPos;
-    public Vector3 radius;
-    private float baseDiameter;
-    private float spawnlingDiameter;
+    private float radius;
     private float timer;
 
     [SerializeField] private int reserves;
@@ -19,17 +17,13 @@ public class BaseBehavior : MonoBehaviour
     {
         //Get relevant data for variables
         baseColor = GameManager.GetColor(gameObject);
-        baseDiameter = GetDiameter(this.gameObject);
-        spawnlingDiameter = GetDiameter(spawnling);
         timer = spawnTime;
-
-        //Establish bases radius
-        radius = transform.position.normalized * baseDiameter;
 
         //Angle Base towards center of arena
         arenaCenterPos = GameObject.Find("ArenaCenter").transform.position - transform.position;
         float angle = Mathf.Atan2(arenaCenterPos.y, arenaCenterPos.x) * Mathf.Rad2Deg - 90;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        radius = GetRadius(gameObject);
     }
 
     // Update is called once per frame
@@ -43,7 +37,7 @@ public class BaseBehavior : MonoBehaviour
         }
     }
 
-    private float GetDiameter(GameObject item)
+    private float GetRadius(GameObject item)
     {
         return item.GetComponent<CircleCollider2D>().radius;
     }
@@ -69,8 +63,11 @@ public class BaseBehavior : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        Debug.Log("Collision Detected");
-        Vector3 direction = (other.transform.position - this.transform.position);
-        other.transform.position += direction;
+        if (!other.CompareTag("Spawnling"))
+            return;
+
+        float otherRadius = other.GetComponent<CircleCollider2D>().radius;
+        Vector3 direction = (other.transform.position - this.transform.position).normalized;
+        other.transform.position = transform.position + (direction * radius) + (direction * otherRadius);
     }
 }
