@@ -27,8 +27,8 @@ public class ProxyManager :  MonoBehaviour {
         {
             relevantObjects[GameManager.GetColor(b.gameObject)] = new LinkedList<GameObject>();
             relevantObjects[GameManager.GetColor(b.gameObject)].AddLast(b.gameObject);
+            worldSpawnlings[GameManager.GetColor(b.gameObject)] = new LinkedList<GameObject>();
         }
-        worldSpawnlings = new Dictionary<string, LinkedList<GameObject>>();
     }
 
     public static GameObject GetNearestBase(GameObject subject)

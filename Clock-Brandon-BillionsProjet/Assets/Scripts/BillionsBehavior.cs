@@ -3,11 +3,14 @@ using UnityEngine;
 public class BillionsBehavior : MonoBehaviour
 {
     private static int billionNumber;
-    private float billionRadius;
+    public float billionRadius;
     private Transform myPos;
     private string color;
 
-    public bool atWaypoint;
+    private bool atWaypoint;
+    private bool packLeader;
+    private Waypoint waypoint;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -18,7 +21,6 @@ public class BillionsBehavior : MonoBehaviour
         name = "Team " + color + " Billion Unit " + billionNumber;
         billionNumber++;
         myPos = transform;
-        atWaypoint = false;
     }
 
     // Update is called once per frame
@@ -28,8 +30,16 @@ public class BillionsBehavior : MonoBehaviour
             positionAdjuster();
 
         GameObject nearestWaypoint = ProxyManager.GetNearestRelevantObject(gameObject, color);
+        if (nearestWaypoint != null)
+            waypoint = nearestWaypoint.GetComponent<Waypoint>();
 
-        if (nearestWaypoint != null && !atWaypoint)
+        if (atWaypoint)
+            atWaypoint = waypoint.HasPackLeader();
+
+
+
+
+        if (waypoint != null && nearestWaypoint != null)
             MoveTowards(nearestWaypoint);
 
     }
@@ -95,20 +105,16 @@ public class BillionsBehavior : MonoBehaviour
                 }
                 //If other billions center point is within the radius of this billion, push billion in a direction equal to that distance
                 //plus the radius
-                else if (distanceBetweenCenters < billionRadius)
+                else if (distanceBetweenCenters < billionRadius && overlap > 1)
                 {
+                    float distanceToMove = Vector3.Distance(otherPos.position, pointOnRadius);
                     Vector3 direction = (new Vector3(xOffset, yOffset, 0f) + directionTo).normalized;
-                    Vector3 oldPos = billion.transform.position;
-                    billion.transform.position += (direction * distanceBetweenCenters).normalized * billionRadius;
+                    billion.transform.position = myPos.position + (direction * billionRadius) + (direction * otherRadius);
                     return;
                 }
-                //Lastly if only the point on the other billions radius is within this billions radius, move this billion in a direction
-                //equal to the overlap
-                else if (distanceFromOtherPoint < billionRadius)
+                else if (distanceBetweenCenters > billionRadius && overlap < 1)
                 {
-                    Vector3 direction = (new Vector3(xOffset, yOffset, 0f) + directionTo).normalized;
-                    billion.transform.position += (direction * overlap) * billionRadius;
-                    return;
+                    billion.transform.position = myPos.position + (directionTo * billionRadius) + (directionTo * otherRadius);
                 }
             }
         }
@@ -119,22 +125,26 @@ public class BillionsBehavior : MonoBehaviour
         float angle = Mathf.Atan2(location.transform.position.x, location.transform.position.y) * Mathf.Rad2Deg - 90;
         Vector3 direction = location.transform.position - transform.position;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
-        if (transform.position != location.transform.position)
+
+
+        if (Vector3.Distance(location.transform.position, myPos.position) > billionRadius)
             transform.position += direction.normalized * Time.deltaTime;
-        else if (Vector3.Distance(transform.position, location.transform.position) < billionRadius / 4f)
+        else if (myPos.position == location.transform.position)
+        {
+            waypoint.MakePackLeader(gameObject);
             atWaypoint = true;
+        }
+
     }
 
-    public void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Spawnling"))
+        if (waypoint == null)
+            return;
+
+        if (other.gameObject.CompareTag("Spawnling") && GameManager.GetColor(other.gameObject) == color && waypoint.HasPackLeader())
         {
             BillionsBehavior otherBillion = other.GetComponent<BillionsBehavior>();
-            if (atWaypoint && otherBillion.color == color)
-            {
-                otherBillion.atWaypoint = true;
-            }
         }
     }
-
 }
