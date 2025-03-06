@@ -104,13 +104,11 @@ public class ProxyManager :  MonoBehaviour {
         if (!relevantObjects[playersSide].Contains(obj) && obj.tag == "Waypoint")
         {
             relevantObjects[playersSide].AddLast(obj);
-            Debug.Log("RelObj: " + relevantObjects[playersSide].Count);
         }
 
         if (!worldSpawnlings[playersSide].Contains(obj) && obj.tag == "Spawnling")
         {
             worldSpawnlings[playersSide].AddLast(obj);
-            Debug.Log("WS: " +worldSpawnlings[playersSide].Count);
         }
     }
 

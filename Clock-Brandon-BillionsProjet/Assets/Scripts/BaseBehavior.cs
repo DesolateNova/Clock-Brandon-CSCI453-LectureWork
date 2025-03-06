@@ -30,7 +30,6 @@ public class BaseBehavior : MonoBehaviour
         arenaCenterPos = GameObject.Find("ArenaCenter").transform.position - transform.position;
         float angle = Mathf.Atan2(arenaCenterPos.y, arenaCenterPos.x) * Mathf.Rad2Deg - 90;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
-        Debug.Log(GameManager.GetColor(gameObject) + " Base, Reporting for Duty!");
     }
 
     // Update is called once per frame
@@ -65,23 +64,13 @@ public class BaseBehavior : MonoBehaviour
         if (!ProxyManager.worldSpawnlings.ContainsKey(color))
             ProxyManager.worldSpawnlings[color] = new LinkedList<GameObject>();
         ProxyManager.AddToSide(color, spawn);
-        Debug.Log("Color: " + color);
-        Debug.Log("GameObject: " + spawn.name);
         reserves--;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerStay2D(Collider2D other)
     {
-        string owner = GameManager.GetColor(collision.gameObject);
-        if (ProxyManager.worldSpawnlings.ContainsKey(owner) && ProxyManager.worldSpawnlings[owner].Contains(collision.gameObject))
-        {
-            Vector3 direction = (collision.transform.position - this.transform.position).normalized;
-            collision.transform.position += direction;
-        }
-
+        Debug.Log("Collision Detected");
+        Vector3 direction = (other.transform.position - this.transform.position);
+        other.transform.position += direction;
     }
-
-
-
-
 }
