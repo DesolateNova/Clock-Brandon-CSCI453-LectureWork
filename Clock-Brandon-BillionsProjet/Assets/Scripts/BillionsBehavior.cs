@@ -4,12 +4,17 @@ public class BillionsBehavior : MonoBehaviour
 {
 
     [SerializeField] float movementSpeed;
+    [SerializeField] float timeToMaxVelocity;
     private static int billionNumber;
 
 
     public float billionRadius;
     private Transform myPos;
     private string color;
+
+    private float velocityGain;
+    private float currentVelocity;
+    private float initialVelocity = 0.25f;
 
     private bool atWaypoint;
     private bool firstMove;
@@ -132,13 +137,27 @@ public class BillionsBehavior : MonoBehaviour
         Vector3 direction = location.transform.position - transform.position;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
 
+        if (firstMove == false && atWaypoint == false)
+            velocityGain += Time.deltaTime;
+        else
+            velocityGain = 0f;
+
+        if (velocityGain / timeToMaxVelocity > 1f)
+            currentVelocity = 1f;
+        else if (velocityGain / timeToMaxVelocity > initialVelocity)
+            currentVelocity = velocityGain / timeToMaxVelocity;
+        else
+            currentVelocity = initialVelocity;
+            
         if (Vector3.Distance(location.transform.position, myPos.position) > billionRadius)
-            transform.position += direction.normalized * Time.deltaTime;
+            transform.position += direction.normalized * (Time.deltaTime * movementSpeed * currentVelocity);
         else if (Vector3.Distance(location.transform.position, myPos.position) < billionRadius)
         {
             waypoint.MakePackLeader(gameObject);
             atWaypoint = true;
         }
+
+        firstMove = false;
     }
 
     private void OnTriggerStay2D(Collider2D other)
