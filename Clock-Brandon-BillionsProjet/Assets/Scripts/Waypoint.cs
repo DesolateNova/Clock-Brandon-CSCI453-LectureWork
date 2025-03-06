@@ -30,4 +30,9 @@ public class Waypoint : MonoBehaviour
     {
         return packLeader != null;
     }
+
+    public GameObject GetPackLeader()
+    {
+        return packLeader;
+    }
 }

@@ -21,6 +21,7 @@ public class BillionsBehavior : MonoBehaviour
         name = "Team " + color + " Billion Unit " + billionNumber;
         billionNumber++;
         myPos = transform;
+        atWaypoint = false;
     }
 
     // Update is called once per frame
@@ -33,11 +34,14 @@ public class BillionsBehavior : MonoBehaviour
         if (nearestWaypoint != null)
             waypoint = nearestWaypoint.GetComponent<Waypoint>();
 
-        if (waypoint != null && !waypoint.HasPackLeader())
-            atWaypoint = waypoint.HasPackLeader();
+        if (waypoint != null)
+        {
+            if (waypoint.HasPackLeader() == false && atWaypoint == true)
+                atWaypoint = false;
 
-        if (waypoint != null && atWaypoint == false)
-            MoveTowards(nearestWaypoint);
+            if (atWaypoint == false)
+                MoveTowards(nearestWaypoint);
+        }
 
     }
 
@@ -106,12 +110,12 @@ public class BillionsBehavior : MonoBehaviour
                 {
                     float distanceToMove = Vector3.Distance(otherPos.position, pointOnRadius);
                     Vector3 direction = (new Vector3(xOffset, yOffset, 0f) + directionTo).normalized;
-                    billion.transform.position = myPos.position + (direction * billionRadius) + (direction * otherRadius);
+                    billion.transform.position = myPos.position + (direction * billionRadius) + (direction * (otherRadius + 0.0001f));
                     return;
                 }
                 else if (distanceBetweenCenters > billionRadius && overlap < 1)
                 {
-                    billion.transform.position = myPos.position + (directionTo * billionRadius) + (directionTo * otherRadius);
+                    billion.transform.position = myPos.position + (directionTo * billionRadius) + (directionTo * (otherRadius + 0.0001f));
                 }
             }
         }
@@ -131,18 +135,18 @@ public class BillionsBehavior : MonoBehaviour
             waypoint.MakePackLeader(gameObject);
             atWaypoint = true;
         }
-
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerStay2D(Collider2D other)
     {
         if (waypoint == null)
             return;
 
-        if (other.gameObject.CompareTag("Spawnling") && GameManager.GetColor(other.gameObject) == color && waypoint.HasPackLeader())
+        if (other.CompareTag("Spawnling"))
         {
             BillionsBehavior otherBillion = other.GetComponent<BillionsBehavior>();
             atWaypoint = otherBillion.atWaypoint;
         }
+
     }
 }
