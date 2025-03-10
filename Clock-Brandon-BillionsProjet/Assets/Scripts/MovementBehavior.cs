@@ -47,6 +47,8 @@ public class MovementBehavior : MonoBehaviour
         if (selectedObject != null)
             Debug.Log("Selected Object: " + selectedObject.name);
 
+        //Temporary solution to applying damage to a billion. Create a raycast at mouse click, it it is a billion apply
+        //damage to the billion equal to 1/4 the billions max health
         if (Input.GetMouseButtonDown(0))
         {
             hit = Physics2D.Raycast(new Vector2(GameManager.mousePointer.transform.position.x, GameManager.mousePointer.transform.position.y), Vector2.zero);

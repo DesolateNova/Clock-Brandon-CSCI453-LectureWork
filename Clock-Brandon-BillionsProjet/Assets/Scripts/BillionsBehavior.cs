@@ -64,6 +64,8 @@ public class BillionsBehavior : MonoBehaviour
         Debug.Log(visualHealthScaler);
         healthObject.transform.localScale = ((new Vector3(0.5f, 0.5f, 0) * visualHealthScaler) + new Vector3(0.5f, 0.5f, 0));
 
+
+        //If current health is below or equal to 0, remove the billion from the proxymanager and destroy the billion.
         if (currentHealth <= 0)
         {
             ProxyManager.worldSpawnlings[color].Remove(gameObject);
