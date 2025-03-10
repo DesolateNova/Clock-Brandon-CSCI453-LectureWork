@@ -47,6 +47,21 @@ public class MovementBehavior : MonoBehaviour
         if (selectedObject != null)
             Debug.Log("Selected Object: " + selectedObject.name);
 
+        if (Input.GetMouseButtonDown(0))
+        {
+            hit = Physics2D.Raycast(new Vector2(GameManager.mousePointer.transform.position.x, GameManager.mousePointer.transform.position.y), Vector2.zero);
+            if (hit)
+            {
+                BillionsBehavior temp;
+                if (hit.collider.gameObject.CompareTag("Spawnling"))
+                {
+                    temp = hit.collider.gameObject.GetComponent<BillionsBehavior>();
+                    temp.TakeDamage(temp.maxHealth / 4);
+                }
+                return;
+            }
+        }
+
 
         if (Input.GetAxis("Mouse0") == 0)
         {

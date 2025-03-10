@@ -46,17 +46,18 @@ public class BaseBehavior : MonoBehaviour
     {
         GameObject spawn = Instantiate(spawnling, transform.position + transform.up, transform.rotation);
         string color = GameManager.GetColor(gameObject);
+        SpriteRenderer spawnColorSetter = spawn.transform.GetChild(0).GetComponent<SpriteRenderer>();
         if (color == "Green")
-            spawn.GetComponent<SpriteRenderer>().color = Color.green;
+            spawnColorSetter.color = Color.green;
         else if (color == "Yellow")
-            spawn.GetComponent<SpriteRenderer>().color = Color.yellow;
+            spawnColorSetter.color = Color.yellow;
         else if (color == "Red")
-            spawn.GetComponent<SpriteRenderer>().color = Color.red;
+            spawnColorSetter.color = Color.red;
         else if (color == "Blue")
-            spawn.GetComponent<SpriteRenderer>().color = Color.blue;
+            spawnColorSetter.color = Color.blue;
 
-        if (!ProxyManager.worldSpawnlings.ContainsKey(color))
-            ProxyManager.worldSpawnlings[color] = new LinkedList<GameObject>();
+                            if (!ProxyManager.worldSpawnlings.ContainsKey(color))
+                                ProxyManager.worldSpawnlings[color] = new LinkedList<GameObject>();
         ProxyManager.AddToSide(color, spawn);
         reserves--;
     }

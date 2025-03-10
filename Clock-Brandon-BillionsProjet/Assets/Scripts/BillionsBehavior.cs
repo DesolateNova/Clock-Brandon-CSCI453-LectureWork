@@ -9,7 +9,6 @@ public class BillionsBehavior : MonoBehaviour
 
 
     public float billionRadius;
-    private Transform myPos;
     private string color;
 
     private float velocityGain;
@@ -18,13 +17,21 @@ public class BillionsBehavior : MonoBehaviour
 
     private bool atWaypoint;
     private bool firstMove;
+
+
+    private Transform myPos;
     private Waypoint waypoint;
+
+
+    [SerializeField] public float maxHealth;
+    private float currentHealth;
+    private SpriteRenderer healthVisualizer;
+    private GameObject healthObject;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
         billionRadius = gameObject.GetComponent<CircleCollider2D>().radius;
         color = GameManager.GetColor(gameObject);
         name = "Team " + color + " Billion Unit " + billionNumber;
@@ -32,19 +39,19 @@ public class BillionsBehavior : MonoBehaviour
         myPos = transform;
         atWaypoint = false;
         firstMove = true;
+        healthVisualizer = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        healthObject = transform.GetChild(0).gameObject;
+        currentHealth = maxHealth;
     }
 
     // Update is called once per frame
     void Update()
     {
         if (ProxyManager.worldSpawnlings[color] != null && ProxyManager.worldSpawnlings[color].Count > 1)
-            positionAdjuster();
+            PositionAdjuster();
 
         GameObject nearestWaypoint = ProxyManager.GetNearestRelevantObject(gameObject, color);
-        if (nearestWaypoint != null)
-            waypoint = nearestWaypoint.GetComponent<Waypoint>();
-
-        if (waypoint != null)
+        if (nearestWaypoint != null && nearestWaypoint.TryGetComponent<Waypoint>(out waypoint))
         {
             if (waypoint.HasPackLeader() == false && atWaypoint == true)
                 atWaypoint = false;
@@ -53,9 +60,18 @@ public class BillionsBehavior : MonoBehaviour
                 MoveTowards(nearestWaypoint);
         }
 
+        float visualHealthScaler = (currentHealth / maxHealth);
+        Debug.Log(visualHealthScaler);
+        healthObject.transform.localScale = ((new Vector3(0.5f, 0.5f, 0) * visualHealthScaler) + new Vector3(0.5f, 0.5f, 0));
+
+        if (currentHealth <= 0)
+        {
+            ProxyManager.worldSpawnlings[color].Remove(gameObject);
+            Destroy(gameObject);
+        }
     }
 
-    private void positionAdjuster()
+    private void PositionAdjuster()
     {
         
         foreach (string color in ProxyManager.worldSpawnlings.Keys)
@@ -160,10 +176,16 @@ public class BillionsBehavior : MonoBehaviour
         firstMove = false;
     }
 
+    public void TakeDamage(float damage)
+    {
+        currentHealth -= damage;
+    }
+
     private void OnTriggerStay2D(Collider2D other)
     {
         if (waypoint == null)
             return;
+
 
         if (other.CompareTag("Spawnling"))
         {

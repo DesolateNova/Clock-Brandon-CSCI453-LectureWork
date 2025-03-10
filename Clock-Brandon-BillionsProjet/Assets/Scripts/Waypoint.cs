@@ -14,7 +14,6 @@ public class Waypoint : MonoBehaviour
 
         if (packLeader != null && billion != null)
         {
-            Debug.Log(packLeader.name + " is packleader of waypoint at " + gameObject.transform.position);
             if (Vector3.Distance(packLeader.transform.position, transform.position) > billion.billionRadius)
                 packLeader = null;
         }
@@ -22,7 +21,6 @@ public class Waypoint : MonoBehaviour
 
     public void MakePackLeader(GameObject candidate)
     {
-        Debug.Log(gameObject.name + " Making " + candidate.name + " Pack Leader");
         packLeader = candidate;
     }
 

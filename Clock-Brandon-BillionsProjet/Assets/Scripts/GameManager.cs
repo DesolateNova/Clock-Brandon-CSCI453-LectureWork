@@ -60,6 +60,20 @@ public class GameManager : MonoBehaviour
 
     public static string GetColor(GameObject item)
     {
+        if (item.CompareTag("Spawnling"))
+        {
+            Color objectColor = item.transform.GetChild(0).GetComponent<SpriteRenderer>().color;
+            if (objectColor == red.Key)
+                return red.Value;
+            else if (objectColor == yellow.Key)
+                return yellow.Value;
+            else if (objectColor == green.Key)
+                return green.Value;
+            else if (objectColor == blue.Key)
+                return blue.Value;
+            else return "Unkown Color";
+        }
+
         string postFix = item.name.Substring(item.name.Length - 2);
         if (postFix == "_G")
             return "Green";
@@ -69,18 +83,6 @@ public class GameManager : MonoBehaviour
             return "Blue";
         else if (postFix == "_R")
             return "Red";
-
-        Color objectColor = item.GetComponent<SpriteRenderer>().color;
-        if (objectColor == red.Key)
-            return red.Value;
-        else if (objectColor == yellow.Key)
-            return yellow.Value;
-        else if (objectColor == green.Key)
-            return green.Value;
-        else if (objectColor == blue.Key)
-            return blue.Value;
-
         else return "Unknown Color";
-        
     }
 }
