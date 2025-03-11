@@ -17,6 +17,7 @@ public class BillionsBehavior : MonoBehaviour
 
     private bool atWaypoint;
     private bool firstMove;
+    private bool atBoundry;
 
 
     private Transform myPos;
@@ -25,7 +26,6 @@ public class BillionsBehavior : MonoBehaviour
 
     [SerializeField] public float maxHealth;
     private float currentHealth;
-    private SpriteRenderer healthVisualizer;
     private GameObject healthObject;
 
 
@@ -39,7 +39,6 @@ public class BillionsBehavior : MonoBehaviour
         myPos = transform;
         atWaypoint = false;
         firstMove = true;
-        healthVisualizer = transform.GetChild(0).GetComponent<SpriteRenderer>();
         healthObject = transform.GetChild(0).gameObject;
         currentHealth = maxHealth;
     }
@@ -53,15 +52,15 @@ public class BillionsBehavior : MonoBehaviour
         GameObject nearestWaypoint = ProxyManager.GetNearestRelevantObject(gameObject, color);
         if (nearestWaypoint != null && nearestWaypoint.TryGetComponent<Waypoint>(out waypoint))
         {
+            if (atWaypoint == false)
+                MoveTowards(nearestWaypoint);
+
             if (waypoint.HasPackLeader() == false && atWaypoint == true)
                 atWaypoint = false;
 
-            if (atWaypoint == false)
-                MoveTowards(nearestWaypoint);
         }
 
         float visualHealthScaler = (currentHealth / maxHealth);
-        Debug.Log(visualHealthScaler);
         healthObject.transform.localScale = ((new Vector3(0.5f, 0.5f, 0) * visualHealthScaler) + new Vector3(0.5f, 0.5f, 0));
 
 
@@ -152,13 +151,12 @@ public class BillionsBehavior : MonoBehaviour
     private void MoveTowards(GameObject location)
     {
         float angle = Mathf.Atan2(location.transform.position.x, location.transform.position.y) * Mathf.Rad2Deg - 90;
-        Vector3 direction = location.transform.position - transform.position;
+        Vector3 direction = GameManager.GetDirectionTowards(location, gameObject);
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
 
         if (firstMove == false && atWaypoint == false)
             velocityGain += Time.deltaTime;
-        else
-            velocityGain = 0f;
+
 
         if (velocityGain / timeToMaxVelocity > 1f)
             currentVelocity = 1f;
@@ -166,15 +164,18 @@ public class BillionsBehavior : MonoBehaviour
             currentVelocity = velocityGain / timeToMaxVelocity;
         else
             currentVelocity = initialVelocity;
+
             
         if (Vector3.Distance(location.transform.position, myPos.position) > billionRadius)
             transform.position += direction.normalized * (Time.deltaTime * movementSpeed * currentVelocity);
+
+
         else if (Vector3.Distance(location.transform.position, myPos.position) < billionRadius)
         {
             waypoint.MakePackLeader(gameObject);
+            velocityGain = 0f;
             atWaypoint = true;
         }
-
         firstMove = false;
     }
 
@@ -183,17 +184,16 @@ public class BillionsBehavior : MonoBehaviour
         currentHealth -= damage;
     }
 
-    private void OnTriggerStay2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (waypoint == null)
             return;
-
 
         if (other.CompareTag("Spawnling"))
         {
             BillionsBehavior otherBillion = other.GetComponent<BillionsBehavior>();
             atWaypoint = otherBillion.atWaypoint;
         }
-
     }
+
 }

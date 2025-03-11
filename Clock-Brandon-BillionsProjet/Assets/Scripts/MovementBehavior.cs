@@ -14,6 +14,7 @@ public class MovementBehavior : MonoBehaviour
     private GameObject selectedObject;
     private float timer, clickDelay;
     private LineRenderer traceLine;
+    private LayerMask def;
 
     void Awake()
     {
@@ -36,7 +37,10 @@ public class MovementBehavior : MonoBehaviour
         blueFlag = Resources.Load<GameObject>("Prefabs/Flag_B");
         greenFlag = Resources.Load<GameObject>("Prefabs/Flag_G");
         yellowFlag = Resources.Load<GameObject>("Prefabs/Flag_Y");
+
         timer = clickDelay;
+
+        def = LayerMask.GetMask("Default");
     }
 
     // Update is called once per frame
@@ -44,14 +48,12 @@ public class MovementBehavior : MonoBehaviour
     {
         enforceCap(nGreen, nYellow, nBlue, nRed);
         RaycastHit2D hit;
-        if (selectedObject != null)
-            Debug.Log("Selected Object: " + selectedObject.name);
 
         //Temporary solution to applying damage to a billion. Create a raycast at mouse click, it it is a billion apply
         //damage to the billion equal to 1/4 the billions max health
         if (Input.GetMouseButtonDown(0))
         {
-            hit = Physics2D.Raycast(new Vector2(GameManager.mousePointer.transform.position.x, GameManager.mousePointer.transform.position.y), Vector2.zero);
+            hit = Physics2D.Raycast(new Vector2(GameManager.mousePointer.transform.position.x, GameManager.mousePointer.transform.position.y), Vector2.zero, 0, def);
             if (hit)
             {
                 BillionsBehavior temp;
@@ -65,6 +67,9 @@ public class MovementBehavior : MonoBehaviour
         }
 
 
+        //Mouse behavior for setting down waypoints.
+        //If the mouse button is held down more than two frames on a selected waypoint, start click and drag movement behavior.
+        //else move the nearest waypoint to the mouse position, or create a waypoint based on the nearest base and its color.
         if (Input.GetAxis("Mouse0") == 0)
         {
             timer = clickDelay;
@@ -83,7 +88,7 @@ public class MovementBehavior : MonoBehaviour
             if (timer >= 0f)
             {
                 string flagOwner;
-                hit = Physics2D.Raycast(new Vector2(GameManager.mousePointer.transform.position.x, GameManager.mousePointer.transform.position.y), Vector2.zero);
+                hit = Physics2D.Raycast(new Vector2(GameManager.mousePointer.transform.position.x, GameManager.mousePointer.transform.position.y), Vector2.zero, 0, def);
                 if (hit)
                     selectedObject = hit.collider.gameObject;
 
@@ -113,6 +118,7 @@ public class MovementBehavior : MonoBehaviour
         }
     }
 
+    //Code for creation of a trace line to visually indicate where the selected waypoint should move. 
     private void AddTraceLine(GameObject obj)
     {
         traceLine = obj.AddComponent<LineRenderer>();

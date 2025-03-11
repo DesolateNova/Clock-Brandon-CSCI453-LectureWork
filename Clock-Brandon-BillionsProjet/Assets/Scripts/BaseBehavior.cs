@@ -68,7 +68,7 @@ public class BaseBehavior : MonoBehaviour
             return;
 
         float otherRadius = other.GetComponent<CircleCollider2D>().radius;
-        Vector3 direction = (other.transform.position - this.transform.position).normalized;
+        Vector3 direction = GameManager.GetDirectionTowards(other.gameObject, gameObject);
         other.transform.position = transform.position + (direction * radius) + (direction * otherRadius);
     }
 }

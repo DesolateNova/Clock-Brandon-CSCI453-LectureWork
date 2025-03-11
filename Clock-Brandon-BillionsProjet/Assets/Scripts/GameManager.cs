@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class GameManager : MonoBehaviour
     private static KeyValuePair<Color, string> yellow = new KeyValuePair<Color, string>(Color.yellow, "Yellow");
     private static KeyValuePair<Color, string> green = new KeyValuePair<Color, string>(Color.green, "Green");
     public static GameObject mousePointer;
+
+    public static TilemapCollider2D borderWall;
 
 
 
@@ -37,6 +40,7 @@ public class GameManager : MonoBehaviour
         mousePointer = Resources.Load<GameObject>("Prefabs/MousePointer");
         mousePointer = Instantiate(mousePointer, Vector3.zero, Quaternion.identity);
         mousePointer.name = "MousePointer";
+
     }
 
     // Update is called once per frame
@@ -84,5 +88,10 @@ public class GameManager : MonoBehaviour
         else if (postFix == "_R")
             return "Red";
         else return "Unknown Color";
+    }
+
+    public static Vector3 GetDirectionTowards(GameObject to, GameObject from)
+    {
+        return (to.transform.position - from.transform.position).normalized;
     }
 }
