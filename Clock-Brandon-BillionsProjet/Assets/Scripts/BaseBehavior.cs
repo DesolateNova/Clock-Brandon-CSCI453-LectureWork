@@ -56,8 +56,8 @@ public class BaseBehavior : MonoBehaviour
         else if (color == "Blue")
             spawnColorSetter.color = Color.blue;
 
-                            if (!ProxyManager.worldSpawnlings.ContainsKey(color))
-                                ProxyManager.worldSpawnlings[color] = new LinkedList<GameObject>();
+            if (!ProxyManager.worldSpawnlings.ContainsKey(color))
+                 ProxyManager.worldSpawnlings[color] = new LinkedList<GameObject>();
         ProxyManager.AddToSide(color, spawn);
         reserves--;
     }
