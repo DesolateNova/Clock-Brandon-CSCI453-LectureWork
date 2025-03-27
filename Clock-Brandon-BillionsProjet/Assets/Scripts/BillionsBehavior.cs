@@ -17,7 +17,7 @@ public class BillionsBehavior : MonoBehaviour
 
     private bool atWaypoint;
     private bool firstMove;
-    private bool atBoundry;
+    private bool atBoundary;
 
 
     private Transform myPos;
@@ -41,6 +41,8 @@ public class BillionsBehavior : MonoBehaviour
         firstMove = true;
         healthObject = transform.GetChild(0).gameObject;
         currentHealth = maxHealth;
+        atBoundary = false;
+
     }
 
     // Update is called once per frame
@@ -122,10 +124,9 @@ public class BillionsBehavior : MonoBehaviour
                 //If the billions are on top of eachother, push them awayfrom eachother at an equal rate toward a the arena center
                 if (distanceBetweenCenters == 0f)
                 {
-                    Vector3 arenaCenter = GameObject.Find("ArenaCenter").transform.position;
-                    if (arenaCenter != null)
+                    if (GameManager.arenaCenter != null)
                     {
-                        directionTo = (arenaCenter - myPos.position).normalized;
+                        directionTo = GameManager.GetDirectionTowards(GameManager.arenaCenter, gameObject);
                         billion.transform.position += directionTo * (billionRadius + 0.0001f);
                         myPos.position -= directionTo * (billionRadius + 0.0001f);
                         return;
@@ -151,11 +152,14 @@ public class BillionsBehavior : MonoBehaviour
     private void MoveTowards(GameObject location)
     {
         float angle = Mathf.Atan2(location.transform.position.x, location.transform.position.y) * Mathf.Rad2Deg - 90;
-        Vector3 direction = GameManager.GetDirectionTowards(location, gameObject);
+        Vector3 direction = GameManager.GetDirectionTowards(location, gameObject).normalized;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
 
-        if (firstMove == false && atWaypoint == false)
+        if (!firstMove && !atWaypoint)
             velocityGain += Time.deltaTime;
+
+        if (atBoundary)
+            return;
 
 
         if (velocityGain / timeToMaxVelocity > 1f)
@@ -165,9 +169,8 @@ public class BillionsBehavior : MonoBehaviour
         else
             currentVelocity = initialVelocity;
 
-            
         if (Vector3.Distance(location.transform.position, myPos.position) > billionRadius)
-            transform.position += direction.normalized * (Time.deltaTime * movementSpeed * currentVelocity);
+            transform.position += direction * (Time.deltaTime * movementSpeed * currentVelocity);
 
 
         else if (Vector3.Distance(location.transform.position, myPos.position) < billionRadius)
@@ -189,11 +192,42 @@ public class BillionsBehavior : MonoBehaviour
         if (waypoint == null)
             return;
 
+        if (other.gameObject.name == "Border Wall")
+        {
+            if (atBoundary)
+                transform.position += new Vector3(0, 0, 0);
+            else
+                atBoundary = true;
+        }
+
         if (other.CompareTag("Spawnling"))
         {
             BillionsBehavior otherBillion = other.GetComponent<BillionsBehavior>();
             atWaypoint = otherBillion.atWaypoint;
         }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if(other.gameObject.name == "Border Wall")
+        {
+            float lockYAxis = Mathf.Abs(waypoint.transform.position.y) - Mathf.Abs(transform.position.y);
+            float lockXAxis = Mathf.Abs(waypoint.transform.position.x) - Mathf.Abs(transform.position.x);
+            float lockedAxis = Mathf.Max(lockYAxis, lockXAxis);
+
+            if (lockedAxis == lockYAxis)
+                transform.position += new Vector3(transform.position.x, 0, transform.position.z) * Time.deltaTime;
+            else if (lockedAxis == lockXAxis)
+                transform.position += new Vector3(0, transform.position.y, transform.position.z) * Time.deltaTime;
+            else if (lockedAxis == lockYAxis)
+                transform.position += transform.position * Time.deltaTime;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject.name == "Border Walls")
+            atBoundary = false;
     }
 
 }

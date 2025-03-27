@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     private static KeyValuePair<Color, string> yellow = new KeyValuePair<Color, string>(Color.yellow, "Yellow");
     private static KeyValuePair<Color, string> green = new KeyValuePair<Color, string>(Color.green, "Green");
     public static GameObject mousePointer;
+    public static GameObject arenaCenter;
 
     public static TilemapCollider2D borderWall;
 
@@ -33,6 +34,7 @@ public class GameManager : MonoBehaviour
         }
 
         instance = this;
+        arenaCenter = GameObject.Find("Arena Center");
     }
 
     void Start()

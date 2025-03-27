@@ -20,7 +20,7 @@ public class BaseBehavior : MonoBehaviour
         timer = spawnTime;
 
         //Angle Base towards center of arena
-        arenaCenterPos = GameObject.Find("ArenaCenter").transform.position - transform.position;
+        arenaCenterPos = GameManager.arenaCenter.transform.position - transform.position;
         float angle = Mathf.Atan2(arenaCenterPos.y, arenaCenterPos.x) * Mathf.Rad2Deg - 90;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
         radius = GetRadius(gameObject);
