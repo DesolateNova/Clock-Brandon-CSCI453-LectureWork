@@ -27,6 +27,7 @@ public class BillionsBehavior : MonoBehaviour
     [SerializeField] public float maxHealth;
     private float currentHealth;
     private GameObject healthObject;
+    private GameObject turretHardpoint;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -40,6 +41,7 @@ public class BillionsBehavior : MonoBehaviour
         atWaypoint = false;
         firstMove = true;
         healthObject = transform.GetChild(0).gameObject;
+        turretHardpoint = transform.GetChild(1).gameObject;
         currentHealth = maxHealth;
         atBoundary = false;
 
@@ -61,6 +63,8 @@ public class BillionsBehavior : MonoBehaviour
                 atWaypoint = false;
 
         }
+
+        TargetClosestEnemy();
 
         float visualHealthScaler = (currentHealth / maxHealth);
         healthObject.transform.localScale = ((new Vector3(0.5f, 0.5f, 0) * visualHealthScaler) + new Vector3(0.5f, 0.5f, 0));
@@ -185,6 +189,37 @@ public class BillionsBehavior : MonoBehaviour
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
+    }
+
+    private void TargetClosestEnemy()
+    {
+        Vector3 closestBillionVector = new Vector3(int.MaxValue, int.MaxValue, int.MaxValue);
+        GameObject closestBillionObj = null;
+        float angle = 0f;
+        foreach (string color in ProxyManager.worldSpawnlings.Keys)
+        {
+            if (color == this.color)
+                continue;
+
+            foreach (GameObject billion in ProxyManager.worldSpawnlings[color])
+            {
+
+                if (Vector3.Distance(closestBillionVector, myPos.transform.position) > Vector3.Distance(billion.transform.position, myPos.transform.position))
+                {
+                    closestBillionVector = billion.transform.position;
+                    closestBillionObj = billion;
+                }
+            }
+        }
+
+
+        if (closestBillionObj != null)
+        {
+            Vector3 relativeLocation = closestBillionObj.transform.position - myPos.transform.position;
+            angle = Mathf.Atan2(relativeLocation.y, relativeLocation.x) * Mathf.Rad2Deg - 90f;
+            Debug.Log($"{name} turning {angle} degrees towards {closestBillionObj.name}");
+        }
+        turretHardpoint.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
     }
 
     private void OnTriggerEnter2D(Collider2D other)
