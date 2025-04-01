@@ -49,8 +49,8 @@ public class MovementBehavior : MonoBehaviour
         enforceCap(nGreen, nYellow, nBlue, nRed);
         RaycastHit2D hit;
 
-        //Temporary solution to applying damage to a billion. Create a raycast at mouse click, it it is a billion apply
-        //damage to the billion equal to 1/4 the billions max health
+        /*Temporary solution to applying damage to a billion. Create a raycast at mouse click, it it is a billion apply
+          damage to the billion equal to 1/4 the billions max health
         if (Input.GetMouseButtonDown(0))
         {
             hit = Physics2D.Raycast(new Vector2(GameManager.mousePointer.transform.position.x, GameManager.mousePointer.transform.position.y), Vector2.zero, 0, def);
@@ -64,7 +64,7 @@ public class MovementBehavior : MonoBehaviour
                 }
                 return;
             }
-        }
+        }*/
 
 
         //Mouse behavior for setting down waypoints.

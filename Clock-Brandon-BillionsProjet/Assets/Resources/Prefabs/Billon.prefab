@@ -142,8 +142,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 5
   timeToMaxVelocity: 2.5
+  fireRate: 1
+  projectile: {fileID: 4190065138103400929, guid: 41de3196ccc8c114ea18db31c3304bbf, type: 3}
   billionRadius: 0
   maxHealth: 100
+  currentHealth: 0
 --- !u!50 &-7309261573865446413
 Rigidbody2D:
   serializedVersion: 5

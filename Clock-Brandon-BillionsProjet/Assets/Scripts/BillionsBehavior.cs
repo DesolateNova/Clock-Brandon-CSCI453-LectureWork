@@ -5,6 +5,8 @@ public class BillionsBehavior : MonoBehaviour
 
     [SerializeField] float movementSpeed;
     [SerializeField] float timeToMaxVelocity;
+    [SerializeField] float fireRate;
+    [SerializeField] GameObject projectile;
     private static int billionNumber;
 
 
@@ -14,6 +16,7 @@ public class BillionsBehavior : MonoBehaviour
     private float velocityGain;
     private float currentVelocity;
     private float initialVelocity = 0.25f;
+    private float fireRateCooldown;
 
     private bool atWaypoint;
     private bool firstMove;
@@ -24,8 +27,8 @@ public class BillionsBehavior : MonoBehaviour
     private Waypoint waypoint;
 
 
-    [SerializeField] public float maxHealth;
-    private float currentHealth;
+    [SerializeField] int maxHealth;
+    public int currentHealth;
     private GameObject healthObject;
     private GameObject turretHardpoint;
 
@@ -44,12 +47,15 @@ public class BillionsBehavior : MonoBehaviour
         turretHardpoint = transform.GetChild(1).gameObject;
         currentHealth = maxHealth;
         atBoundary = false;
+        fireRateCooldown = fireRate;
 
     }
 
     // Update is called once per frame
     void Update()
     {
+        fireRateCooldown -= Time.deltaTime;
+
         if (ProxyManager.worldSpawnlings[color] != null && ProxyManager.worldSpawnlings[color].Count > 1)
             PositionAdjuster();
 
@@ -65,6 +71,7 @@ public class BillionsBehavior : MonoBehaviour
         }
 
         TargetClosestEnemy();
+        Shoot(fireRateCooldown);
 
         float visualHealthScaler = (currentHealth / maxHealth);
         healthObject.transform.localScale = ((new Vector3(0.5f, 0.5f, 0) * visualHealthScaler) + new Vector3(0.5f, 0.5f, 0));
@@ -186,7 +193,7 @@ public class BillionsBehavior : MonoBehaviour
         firstMove = false;
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(int damage)
     {
         currentHealth -= damage;
     }
@@ -216,10 +223,30 @@ public class BillionsBehavior : MonoBehaviour
         if (closestBillionObj != null)
         {
             Vector3 relativeLocation = closestBillionObj.transform.position - myPos.transform.position;
-            angle = Mathf.Atan2(relativeLocation.y, relativeLocation.x) * Mathf.Rad2Deg - 90f;
-            Debug.Log($"{name} turning {angle} degrees towards {closestBillionObj.name}");
+            angle = (Mathf.Atan2(relativeLocation.y, relativeLocation.x) * Mathf.Rad2Deg) - 90f;
         }
         turretHardpoint.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+    }
+
+    private void Shoot(float timer)
+    {
+        if (timer <= 0)
+        {
+            GameObject spawn = Instantiate(projectile, turretHardpoint.transform.position, turretHardpoint.transform.rotation);
+            SpriteRenderer spawnColorSetter = spawn.transform.GetComponent<SpriteRenderer>();
+            if (color == "Green")
+                spawnColorSetter.color = Color.green;
+            else if (color == "Yellow")
+                spawnColorSetter.color = Color.yellow;
+            else if (color == "Red")
+                spawnColorSetter.color = Color.red;
+            else if (color == "Blue")
+                spawnColorSetter.color = Color.blue;
+            fireRateCooldown = fireRate;
+            return;
+        }
+
+
     }
 
     private void OnTriggerEnter2D(Collider2D other)

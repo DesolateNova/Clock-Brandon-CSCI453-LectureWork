@@ -138,7 +138,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20b94680e1b34e24795f8a8869385942, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: {x: 0, y: 0, z: 0}
   reserves: 7
   spawnling: {fileID: 523395270831460946, guid: e73c46c2027557545b11eff56cbe2f1d, type: 3}
   spawnTime: 2.5
