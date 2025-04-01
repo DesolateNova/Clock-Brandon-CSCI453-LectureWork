@@ -7,6 +7,7 @@ public class BillionsBehavior : MonoBehaviour
     [SerializeField] float timeToMaxVelocity;
     [SerializeField] float fireRate;
     [SerializeField] GameObject projectile;
+    [SerializeField] float range;
     private static int billionNumber;
 
 
@@ -27,8 +28,8 @@ public class BillionsBehavior : MonoBehaviour
     private Waypoint waypoint;
 
 
-    [SerializeField] int maxHealth;
-    public int currentHealth;
+    [SerializeField] float maxHealth;
+    public float currentHealth;
     private GameObject healthObject;
     private GameObject turretHardpoint;
 
@@ -71,10 +72,11 @@ public class BillionsBehavior : MonoBehaviour
         }
 
         TargetClosestEnemy();
-        Shoot(fireRateCooldown);
+
 
         float visualHealthScaler = (currentHealth / maxHealth);
-        healthObject.transform.localScale = ((new Vector3(0.5f, 0.5f, 0) * visualHealthScaler) + new Vector3(0.5f, 0.5f, 0));
+        Debug.Log($"Visual Health Scaler value: {visualHealthScaler}");
+        healthObject.transform.localScale = (new Vector3(0.5f, 0.5f, 0) * visualHealthScaler) + new Vector3(0.5f, 0.5f, 0);
 
 
         //If current health is below or equal to 0, remove the billion from the proxymanager and destroy the billion.
@@ -196,6 +198,7 @@ public class BillionsBehavior : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
+        Debug.Log($"{name} has {currentHealth} health left");
     }
 
     private void TargetClosestEnemy()
@@ -226,6 +229,9 @@ public class BillionsBehavior : MonoBehaviour
             angle = (Mathf.Atan2(relativeLocation.y, relativeLocation.x) * Mathf.Rad2Deg) - 90f;
         }
         turretHardpoint.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        
+        if (closestBillionObj != null && Vector3.Distance(closestBillionObj.transform.position, myPos.transform.position) < range)
+            Shoot(fireRateCooldown);
     }
 
     private void Shoot(float timer)
@@ -233,6 +239,7 @@ public class BillionsBehavior : MonoBehaviour
         if (timer <= 0)
         {
             GameObject spawn = Instantiate(projectile, turretHardpoint.transform.position, turretHardpoint.transform.rotation);
+            ProjectileBehavior projB = spawn.GetComponent<ProjectileBehavior>();
             SpriteRenderer spawnColorSetter = spawn.transform.GetComponent<SpriteRenderer>();
             if (color == "Green")
                 spawnColorSetter.color = Color.green;
@@ -243,6 +250,8 @@ public class BillionsBehavior : MonoBehaviour
             else if (color == "Blue")
                 spawnColorSetter.color = Color.blue;
             fireRateCooldown = fireRate;
+            if (projB != null)
+                projB.SetColor(color);
             return;
         }
 
@@ -267,6 +276,11 @@ public class BillionsBehavior : MonoBehaviour
             BillionsBehavior otherBillion = other.GetComponent<BillionsBehavior>();
             atWaypoint = otherBillion.atWaypoint;
         }
+    }
+
+    public string GetColor()
+    {
+        return color;
     }
 
     private void OnTriggerStay2D(Collider2D other)
