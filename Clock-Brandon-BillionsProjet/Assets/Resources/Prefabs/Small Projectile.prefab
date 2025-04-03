@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -5294985890802880500}
   - component: {fileID: -7432132927927140857}
   m_Layer: 0
-  m_Name: Projectile
+  m_Name: Small Projectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -102,9 +102,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96f426bf9fc3ac94db612d56b9c19959, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 25
-  moveSpeed: 5
-  maxProjectileDist: 15
+  damage: 8
+  moveSpeed: 8
+  maxProjectileDist: 10
 --- !u!61 &-5294985890802880500
 BoxCollider2D:
   m_ObjectHideFlags: 0
