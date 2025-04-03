@@ -17,7 +17,7 @@ public class BillionsBehavior : MonoBehaviour
     private float velocityGain;
     private float currentVelocity;
     private float initialVelocity = 0.25f;
-    private float fireRateCooldown;
+    private float fTimer;
 
     private bool atWaypoint;
     private bool firstMove;
@@ -48,14 +48,14 @@ public class BillionsBehavior : MonoBehaviour
         turretHardpoint = transform.GetChild(1).gameObject;
         currentHealth = maxHealth;
         atBoundary = false;
-        fireRateCooldown = fireRate;
+        fTimer = fireRate;
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        fireRateCooldown -= Time.deltaTime;
+        fTimer -= Time.deltaTime;
 
         if (ProxyManager.worldSpawnlings[color] != null && ProxyManager.worldSpawnlings[color].Count > 1)
             PositionAdjuster();
@@ -71,11 +71,10 @@ public class BillionsBehavior : MonoBehaviour
 
         }
 
-        TargetClosestEnemy();
+        ProxyManager.TargetClosestEnemy(color, range, fTimer, turretHardpoint, projectile, this.gameObject);
 
 
         float visualHealthScaler = (currentHealth / maxHealth);
-        Debug.Log($"Visual Health Scaler value: {visualHealthScaler}");
         healthObject.transform.localScale = (new Vector3(0.5f, 0.5f, 0) * visualHealthScaler) + new Vector3(0.5f, 0.5f, 0);
 
 
@@ -201,62 +200,6 @@ public class BillionsBehavior : MonoBehaviour
         Debug.Log($"{name} has {currentHealth} health left");
     }
 
-    private void TargetClosestEnemy()
-    {
-        Vector3 closestBillionVector = new Vector3(int.MaxValue, int.MaxValue, int.MaxValue);
-        GameObject closestBillionObj = null;
-        float angle = 0f;
-        foreach (string color in ProxyManager.worldSpawnlings.Keys)
-        {
-            if (color == this.color)
-                continue;
-
-            foreach (GameObject billion in ProxyManager.worldSpawnlings[color])
-            {
-
-                if (Vector3.Distance(closestBillionVector, myPos.transform.position) > Vector3.Distance(billion.transform.position, myPos.transform.position))
-                {
-                    closestBillionVector = billion.transform.position;
-                    closestBillionObj = billion;
-                }
-            }
-        }
-
-
-        if (closestBillionObj != null)
-        {
-            Vector3 relativeLocation = closestBillionObj.transform.position - myPos.transform.position;
-            angle = (Mathf.Atan2(relativeLocation.y, relativeLocation.x) * Mathf.Rad2Deg) - 90f;
-        }
-        turretHardpoint.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
-        
-        if (closestBillionObj != null && Vector3.Distance(closestBillionObj.transform.position, myPos.transform.position) < range)
-            Shoot(fireRateCooldown);
-    }
-
-    private void Shoot(float timer)
-    {
-        if (timer <= 0)
-        {
-            GameObject spawn = Instantiate(projectile, turretHardpoint.transform.position, turretHardpoint.transform.rotation);
-            ProjectileBehavior projB = spawn.GetComponent<ProjectileBehavior>();
-            SpriteRenderer spawnColorSetter = spawn.transform.GetComponent<SpriteRenderer>();
-            if (color == "Green")
-                spawnColorSetter.color = Color.green;
-            else if (color == "Yellow")
-                spawnColorSetter.color = Color.yellow;
-            else if (color == "Red")
-                spawnColorSetter.color = Color.red;
-            else if (color == "Blue")
-                spawnColorSetter.color = Color.blue;
-            fireRateCooldown = fireRate;
-            if (projB != null)
-                projB.SetColor(color);
-            return;
-        }
-
-
-    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -281,6 +224,11 @@ public class BillionsBehavior : MonoBehaviour
     public string GetColor()
     {
         return color;
+    }
+
+    public void Reload()
+    {
+        fTimer = fireRate;
     }
 
     private void OnTriggerStay2D(Collider2D other)
