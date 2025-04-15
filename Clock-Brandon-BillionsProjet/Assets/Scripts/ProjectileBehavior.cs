@@ -56,15 +56,29 @@ public class ProjectileBehavior : MonoBehaviour
         }
 
         //If the projectile hits another spawnling of a different team, damage them and destroy this projectile
-        if (other.gameObject.CompareTag("Spawnling"))
+        if (other.gameObject.CompareTag("Spawnling") || other.gameObject.CompareTag("PlayerBase"))
         {
-            BillionsBehavior otherBillion = other.GetComponent<BillionsBehavior>();
-            if (otherBillion.GetColor() != this.color)
+            if (other.gameObject.CompareTag("Spawnling"))
             {
-                otherBillion.TakeDamage(damage);
-                Destroy(gameObject);
-            } 
+                BillionsBehavior otherBillion = other.GetComponent<BillionsBehavior>();
+                if (otherBillion.GetColor() != this.color)
+                {
+                    otherBillion.TakeDamage(damage);
+                    Destroy(gameObject);
+                }
+            }
+
+            else if (other.gameObject.CompareTag("PlayerBase"))
+            {
+                BaseBehavior otherBase = other.GetComponent<BaseBehavior>();
+                if (otherBase.GetColor() != this.color)
+                {
+                    otherBase.TakeDamage(damage);
+                    Destroy(gameObject);
+                }
+            }
         }
+
     }
 
     //Method to declare the color of this projectiles team. Inherited from parent billion.

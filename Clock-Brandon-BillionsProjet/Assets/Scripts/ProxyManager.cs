@@ -5,7 +5,7 @@ public class ProxyManager :  MonoBehaviour {
 
     public ProxyManager instance { get; set; }
 
-    private static Dictionary<string, LinkedList<GameObject>> relevantObjects = new Dictionary<string, LinkedList<GameObject>>();
+    public static Dictionary<string, LinkedList<GameObject>> relevantObjects = new Dictionary<string, LinkedList<GameObject>>();
     public static Dictionary<string, LinkedList<GameObject>> worldSpawnlings = new Dictionary<string, LinkedList<GameObject>>();
     private static BaseBehavior[] startingBases;
     public void Awake()
@@ -28,6 +28,7 @@ public class ProxyManager :  MonoBehaviour {
             relevantObjects[GameManager.GetColor(b.gameObject)] = new LinkedList<GameObject>();
             relevantObjects[GameManager.GetColor(b.gameObject)].AddLast(b.gameObject);
             worldSpawnlings[GameManager.GetColor(b.gameObject)] = new LinkedList<GameObject>();
+            worldSpawnlings[GameManager.GetColor(b.gameObject)].AddLast(b.gameObject);
         }
     }
 
@@ -120,13 +121,15 @@ public class ProxyManager :  MonoBehaviour {
             if (color == team)
                 continue;
 
-            foreach (GameObject billion in ProxyManager.worldSpawnlings[color])
+            foreach (GameObject enemy in ProxyManager.worldSpawnlings[color])
             {
+                if (shooter.GetComponent<BaseBehavior>() && enemy.GetComponent<BaseBehavior>())
+                    continue;
 
-                if (Vector3.Distance(closestBillionVector, position) > Vector3.Distance(billion.transform.position, position))
+                if (Vector3.Distance(closestBillionVector, position) > Vector3.Distance(enemy.transform.position, position))
                 {
-                    closestBillionVector = billion.transform.position;
-                    closestBillionObj = billion;
+                    closestBillionVector = enemy.transform.position;
+                    closestBillionObj = enemy;
                 }
             }
         }

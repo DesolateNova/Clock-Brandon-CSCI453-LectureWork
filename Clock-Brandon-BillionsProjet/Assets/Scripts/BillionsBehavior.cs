@@ -197,7 +197,6 @@ public class BillionsBehavior : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
-        Debug.Log($"{name} has {currentHealth} health left");
     }
 
 

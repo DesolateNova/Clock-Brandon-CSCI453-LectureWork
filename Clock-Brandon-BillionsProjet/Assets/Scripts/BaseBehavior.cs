@@ -8,6 +8,7 @@ public class BaseBehavior : MonoBehaviour
     private float radius;
     private float timer;
     private float fTimer;
+    public float curHealth;
     private GameObject hardpoint;
 
     [SerializeField] private int reserves;
@@ -15,6 +16,9 @@ public class BaseBehavior : MonoBehaviour
     [SerializeField] private float spawnTime, fireRate;
     [SerializeField] private float range;
     [SerializeField] private GameObject projectile;
+    [SerializeField] public  float MAXHEALTH;
+
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -32,6 +36,7 @@ public class BaseBehavior : MonoBehaviour
 
         //Get hardpoint reference
         hardpoint = transform.GetChild(0).gameObject;
+        curHealth = MAXHEALTH;
     }
 
     // Update is called once per frame
@@ -67,8 +72,9 @@ public class BaseBehavior : MonoBehaviour
         else if (color == "Blue")
             spawnColorSetter.color = Color.blue;
 
-            if (!ProxyManager.worldSpawnlings.ContainsKey(color))
-                 ProxyManager.worldSpawnlings[color] = new LinkedList<GameObject>();
+        if (!ProxyManager.worldSpawnlings.ContainsKey(color))
+             ProxyManager.worldSpawnlings[color] = new LinkedList<GameObject>();
+
         ProxyManager.AddToSide(color, spawn);
         reserves--;
     }
@@ -86,5 +92,21 @@ public class BaseBehavior : MonoBehaviour
         float otherRadius = other.GetComponent<CircleCollider2D>().radius;
         Vector3 direction = GameManager.GetDirectionTowards(other.gameObject, gameObject);
         other.transform.position = transform.position + (direction * radius) + (direction * otherRadius);
+    }
+
+    public string GetColor()
+    {
+        return baseColor;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        curHealth -= damage;
+        if (curHealth <= 0)
+        {
+            ProxyManager.worldSpawnlings[baseColor].Remove(gameObject);
+            ProxyManager.relevantObjects[baseColor].Remove(gameObject);
+            Destroy(gameObject);
+        }
     }
 }
