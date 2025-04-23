@@ -1,22 +1,42 @@
 using UnityEngine;
+using UnityEngine.Events;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using TMPro;
 
 public class BaseBehavior : MonoBehaviour
 {
     private string baseColor;
+
+    public float expToLevel;
+    public int rank;
+
     private Vector3 arenaCenterPos;
+
+
     private float radius;
     private float timer;
     private float fTimer;
     public float curHealth;
-    private GameObject hardpoint;
 
-    [SerializeField] private int reserves;
-    [SerializeField] private GameObject spawnling;
-    [SerializeField] private float spawnTime, fireRate;
-    [SerializeField] private float range;
-    [SerializeField] private GameObject projectile;
-    [SerializeField] public  float MAXHEALTH;
+
+    private GameObject hardpoint;
+    private Image expBar;
+    private TextMeshProUGUI rankText;
+    public static UnityEvent<float> awardExp;
+    private UnityEvent rankUp;
+    private GameObject expGameObject;
+
+
+    [SerializeField] int reserves;
+    [SerializeField] GameObject spawnling;
+    [SerializeField] float spawnTime, fireRate;
+    [SerializeField] float range;
+    [SerializeField] GameObject projectile;
+    [SerializeField] public float MAXHEALTH;
+    [SerializeField] public float currentExp;
+    [SerializeField] public float expValue;
+
 
 
 
@@ -37,6 +57,23 @@ public class BaseBehavior : MonoBehaviour
         //Get hardpoint reference
         hardpoint = transform.GetChild(0).gameObject;
         curHealth = MAXHEALTH;
+
+        if (awardExp == null)
+            awardExp = new UnityEvent<float>();
+
+        if (rankUp == null)
+            rankUp = new UnityEvent();
+
+        awardExp.AddListener(AwardExp);
+        rankUp.AddListener(RankUp);
+        expToLevel = 100;
+
+        rank = 1;
+
+        expGameObject = transform.GetChild(2).gameObject;
+        expBar = transform.GetChild(2).GetChild(1).GetComponent<Image>();
+        rankText = transform.GetChild(2).GetChild(2).GetComponent<TextMeshProUGUI>();
+
     }
 
     // Update is called once per frame
@@ -44,6 +81,13 @@ public class BaseBehavior : MonoBehaviour
     {
         timer -= Time.deltaTime;
         fTimer -= Time.deltaTime;
+
+        if (currentExp > 0 && currentExp / expToLevel >= 1)
+        {
+            rankUp.Invoke();
+        }
+
+
         if (timer <= 0 && reserves > 0)
         {
             Spawn();
@@ -51,6 +95,11 @@ public class BaseBehavior : MonoBehaviour
         }
 
         ProxyManager.TargetClosestEnemy(baseColor, range, fTimer, hardpoint, projectile, gameObject);
+
+        
+        rankText.text = rank.ToString();
+        expBar.fillAmount = currentExp / expToLevel;
+        expGameObject.transform.rotation = Quaternion.identity;
     }
 
     private float GetRadius(GameObject item)
@@ -109,4 +158,32 @@ public class BaseBehavior : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    private void AwardExp(float expValue)
+    {
+        currentExp += expValue;
+    }
+
+    private void RankUp()
+    {
+        rank += 1;
+        IncreaseExpToLevel();
+    }
+
+    private void IncreaseExpToLevel()
+    {
+        expToLevel *= 2;
+    }
+    public static int GetRank(string color)
+    {
+        foreach (GameObject o in ProxyManager.relevantObjects[color])
+        {
+            if (o.GetComponent<BaseBehavior>() != null)
+            {
+                return o.GetComponent<BaseBehavior>().rank;
+            }
+        }
+        return 0;
+    }
+
 }

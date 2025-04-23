@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BillionsBehavior : MonoBehaviour
 {
@@ -8,7 +9,13 @@ public class BillionsBehavior : MonoBehaviour
     [SerializeField] float fireRate;
     [SerializeField] GameObject projectile;
     [SerializeField] float range;
+    [SerializeField] public float expValue;
     private static int billionNumber;
+
+    public float rank;
+    private float MAXRANK;
+    private Image rankImage;
+    private GameObject rankGameObject;
 
 
     public float billionRadius;
@@ -50,12 +57,21 @@ public class BillionsBehavior : MonoBehaviour
         atBoundary = false;
         fTimer = fireRate;
 
+        MAXRANK = 10;
+        rank = BaseBehavior.GetRank(color);
+        rankGameObject = transform.GetChild(2).gameObject;
+        rankImage = rankGameObject.transform.GetChild(0).GetComponent<Image>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
         fTimer -= Time.deltaTime;
+
+        rankImage.fillAmount = rank / MAXRANK;
+        rankGameObject.transform.Rotate(0, 0, 33 * Time.deltaTime);
+ 
 
         if (ProxyManager.worldSpawnlings[color] != null && ProxyManager.worldSpawnlings[color].Count > 1)
             PositionAdjuster();
@@ -194,7 +210,7 @@ public class BillionsBehavior : MonoBehaviour
         firstMove = false;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         currentHealth -= damage;
     }

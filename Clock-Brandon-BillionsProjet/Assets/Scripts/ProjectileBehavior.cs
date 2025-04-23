@@ -1,18 +1,34 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ProjectileBehavior : MonoBehaviour
 {
 
-    [SerializeField] int damage;
+    [SerializeField] float damage;
     [SerializeField] int moveSpeed;
     [SerializeField] float maxProjectileDist;
+
+
     Vector3 movementVector;
+
     private float y, x;
+
+
     private string color;
+
+
+    private int rank;
+    private UnityEvent modDamage;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
-    {   
+    {
+        rank = BaseBehavior.GetRank(color);
+        modDamage = new UnityEvent();
+        modDamage.AddListener(ModifyDamage);
+        if (rank > 1)
+            modDamage.Invoke();
+
         //Set the angle of the projectile and create x and y values to act as the slope
         float angle = transform.rotation.eulerAngles.z + 90f;
         y = Mathf.Abs(Mathf.Tan(angle * Mathf.Deg2Rad)) % 360f;
@@ -34,6 +50,9 @@ public class ProjectileBehavior : MonoBehaviour
 
         //Create movement vector using the calculated values
         movementVector = new Vector3(x, y, 0).normalized;
+
+
+
     }
 
     // Update is called once per frame
@@ -45,6 +64,7 @@ public class ProjectileBehavior : MonoBehaviour
         
         if (maxProjectileDist < 0)
             Destroy(gameObject);
+
 
     }
 
@@ -64,6 +84,8 @@ public class ProjectileBehavior : MonoBehaviour
                 if (otherBillion.GetColor() != this.color)
                 {
                     otherBillion.TakeDamage(damage);
+                    if (otherBillion.currentHealth <= 0)
+                        BaseBehavior.awardExp.Invoke(otherBillion.expValue);
                     Destroy(gameObject);
                 }
             }
@@ -74,6 +96,8 @@ public class ProjectileBehavior : MonoBehaviour
                 if (otherBase.GetColor() != this.color)
                 {
                     otherBase.TakeDamage(damage);
+                    if (otherBase.curHealth <= 0)
+                        BaseBehavior.awardExp.Invoke(otherBase.expValue);
                     Destroy(gameObject);
                 }
             }
@@ -86,4 +110,11 @@ public class ProjectileBehavior : MonoBehaviour
     {
         this.color = color;
     }
+
+    private void ModifyDamage()
+    {
+        damage = damage + (rank * 0.15f);
+    }
+
+
 }

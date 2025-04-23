@@ -2286,7 +2286,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5699145632081313734, guid: 0073f8710a5ba8d458f8474218248a83, type: 3}
       propertyPath: reserves
-      value: 1
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 5699145632081313734, guid: 0073f8710a5ba8d458f8474218248a83, type: 3}
       propertyPath: MAXHEALTH
@@ -2294,6 +2294,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5699145632081313734, guid: 0073f8710a5ba8d458f8474218248a83, type: 3}
       propertyPath: curHealth
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5699145632081313734, guid: 0073f8710a5ba8d458f8474218248a83, type: 3}
+      propertyPath: spawnTime
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

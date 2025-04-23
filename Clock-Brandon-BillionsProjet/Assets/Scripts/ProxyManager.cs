@@ -177,11 +177,14 @@ public class ProxyManager :  MonoBehaviour {
                 projB.SetColor(team);
 
             if (shooter.GetComponent<BillionsBehavior>())
+            {
                 shooter.GetComponent<BillionsBehavior>().Reload();
+            }
             else if (shooter.GetComponent<BaseBehavior>())
+            {
                 shooter.GetComponent<BaseBehavior>().Reload();
+            }
 
         }
     }
-
 }
