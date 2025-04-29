@@ -7,8 +7,8 @@ public class ArenaGenerationBehavior : MonoBehaviour
 {
 
     [SerializeField, Tooltip("Size of Arena")] Vector2Int arenaSize;
-
     [SerializeField, Tooltip("Percentage of Arena as floor")] float arenaRatio;
+    [SerializeField, Tooltip("Included Bases")] GameObject[] bases;
 
     public Grid[,] tileGrid;
     public List<ArenaWalker> walkers;
@@ -16,14 +16,26 @@ public class ArenaGenerationBehavior : MonoBehaviour
     public Tile arena;
     public Tile wall;
     public Tile baseSpawner;
+    
 
     public readonly int MAX_WALKERS = 6;
     public int tileCount = default;
     public float waitTimer = 0.05f;
 
+    private GameObject camera;
+    private GameObject arenaCenter;
+    private int baseNumber;
+
     void Awake()
     {
         CreateGrid();
+        camera = GameObject.Find("Main Camera");
+        arenaCenter = GameObject.Find("Arena Center");
+        if (camera != null && arenaCenter != null)
+        {
+            camera.transform.position = new Vector3(arenaSize.x / 2, arenaSize.y / 2, camera.transform.position.z);
+            arenaCenter.transform.position = new Vector3(arenaSize.x / 2, arenaSize.y / 2, 0);
+        }
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -97,6 +109,7 @@ public class ArenaGenerationBehavior : MonoBehaviour
 
                 if (tileGrid[curPos.x, curPos.y] != Grid.ARENA)
                 {
+
                     tileMap.SetTile(curPos, arena);
                     tileCount++;
                     tileGrid[curPos.x, curPos.y] = Grid.ARENA;

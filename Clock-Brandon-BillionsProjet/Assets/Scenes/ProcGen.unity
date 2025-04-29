@@ -148,14 +148,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96f80d8b53fd95a4ab8a78284df920a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arenaSize: {x: 20, y: 20}
-  arenaRatio: 0.4
+  arenaSize: {x: 18, y: 10}
+  arenaRatio: 0.45
+  bases: []
   tileMap: {fileID: 1367369120}
   arena: {fileID: 11400000, guid: cf5babe89f24879448a889187f7d39d7, type: 2}
   wall: {fileID: 11400000, guid: f79f76ff47c83df499064c4c0881a5fd, type: 2}
-  baseSpawner: {fileID: 0}
+  baseSpawner: {fileID: 11400000, guid: 986a89a530152f548912bdbd34861391, type: 2}
   tileCount: 0
-  waitTimer: 0.05
+  waitTimer: 0
 --- !u!4 &497374337
 Transform:
   m_ObjectHideFlags: 0
