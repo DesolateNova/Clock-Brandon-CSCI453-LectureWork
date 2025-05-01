@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using System.Collections;
 using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
@@ -34,11 +34,12 @@ public class GameManager : MonoBehaviour
         }
 
         instance = this;
-        arenaCenter = GameObject.Find("Arena Center");
     }
 
     void Start()
     {
+        arenaCenter = GameObject.Find("Arena Center");
+
         mousePointer = Resources.Load<GameObject>("Prefabs/MousePointer");
         mousePointer = Instantiate(mousePointer, Vector3.zero, Quaternion.identity);
         mousePointer.name = "MousePointer";

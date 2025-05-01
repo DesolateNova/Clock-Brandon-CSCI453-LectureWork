@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
+using System;
+
 
 public class ArenaGenerationBehavior : MonoBehaviour
 {
@@ -12,7 +15,8 @@ public class ArenaGenerationBehavior : MonoBehaviour
 
     public Grid[,] tileGrid;
     public List<ArenaWalker> walkers;
-    public Tilemap tileMap;
+    public Tilemap tileMapA;
+    public Tilemap tileMapW;
     public Tile arena;
     public Tile wall;
     public Tile baseSpawner;
@@ -20,34 +24,54 @@ public class ArenaGenerationBehavior : MonoBehaviour
 
     public readonly int MAX_WALKERS = 6;
     public int tileCount = default;
-    public float waitTimer = 0.05f;
+    private readonly float waitTimer = 0.0f;
 
-    private GameObject camera;
+
+    private readonly float MAKE_BASE_SPAWNER_RATIO = 0.20f;
+    private readonly int baseSpawnMinDist = 4;
+
+
+    private static List<GameObject> activeBases = new List<GameObject>();
+
+    private int MAX_BASES;
+    private int numBases;
+    private int baseIndex = 0;
+
+    private  new GameObject camera;
     private GameObject arenaCenter;
-    private int baseNumber;
+
+    public static bool isLoaded = false;
 
     void Awake()
     {
+        MAX_BASES = bases.Length;
+
         CreateGrid();
         camera = GameObject.Find("Main Camera");
-        arenaCenter = GameObject.Find("Arena Center");
-        if (camera != null && arenaCenter != null)
+
+        if (camera != null)
         {
             camera.transform.position = new Vector3(arenaSize.x / 2, arenaSize.y / 2, camera.transform.position.z);
-            arenaCenter.transform.position = new Vector3(arenaSize.x / 2, arenaSize.y / 2, 0);
         }
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    IEnumerator Start()
     {
+        arenaCenter = Instantiate(Resources.Load<GameObject>("Prefabs/Arena Center"), transform.position, Quaternion.identity);
+        arenaCenter.GetComponent<GameManager>().enabled = true;
+        arenaCenter.GetComponent<ProxyManager>().enabled = true;
+        arenaCenter.GetComponent<MovementBehavior>().enabled = true;
+        arenaCenter.transform.position = new Vector3(arenaSize.x / 2, arenaSize.y / 2, 0);
+        arenaCenter.name = "Arena Center";
 
-    }
+        foreach (GameObject b in activeBases)
+        {
+            b.SetActive(true);
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        isLoaded = true;
+
+        yield return null;
     }
 
     private void CreateGrid()
@@ -69,48 +93,40 @@ public class ArenaGenerationBehavior : MonoBehaviour
         Vector3Int arenaCenter = new Vector3Int(gridLen / 2, gridHeight / 2, 0);
         ArenaWalker currentWalker = new ArenaWalker(new Vector2(arenaCenter.x, arenaCenter.y), GetDirection(), 0.5f);
         tileGrid[arenaCenter.x, arenaCenter.y] = Grid.ARENA;
-        tileMap.SetTile(arenaCenter, arena);
+        tileMapA.SetTile(arenaCenter, arena);
         walkers.Add(currentWalker);
 
-        StartCoroutine(CreateFloor());
         tileCount++;
-    }
-
-    Vector2 GetDirection()
-    {
-
-        int choice = Mathf.FloorToInt(UnityEngine.Random.value * 3.99f);
-
-        switch (choice)
-        {
-            case 0:
-                return Vector2.down;
-            case 1:
-                return Vector2.left;
-            case 2:
-                return Vector2.up;
-            case 3:
-                return Vector2.right;
-            default:
-                return Vector2.zero;
-
-        }
-
+        StartCoroutine(CreateFloor());
     }
 
     IEnumerator CreateFloor()
     {
-        bool hasCreatedFloor = false;
-        while ((float)tileCount / (float)tileGrid.Length < arenaRatio)
+        while ((float)tileCount / (float)tileGrid.Length < arenaRatio || numBases < MAX_BASES)
         {
+            bool hasCreatedFloor = false;
             foreach (ArenaWalker curWalker in walkers)
             {
                 Vector3Int curPos = new Vector3Int((int)curWalker.pos.x, (int)curWalker.pos.y, 0);
+                Vector3 tileCenter = new Vector3(curPos.x + 0.5f, curPos.y + 0.5f, 0f);
 
                 if (tileGrid[curPos.x, curPos.y] != Grid.ARENA)
                 {
 
-                    tileMap.SetTile(curPos, arena);
+                    if (UnityEngine.Random.value < MAKE_BASE_SPAWNER_RATIO)
+                    {
+                        if (baseIndex == 0 || (baseIndex < MAX_BASES && ValidDistance(tileCenter)))
+                        {
+                            //
+                            GameObject b = Instantiate(bases[baseIndex], tileCenter, Quaternion.identity);
+                            activeBases.Add(b);
+                            baseIndex++;
+                            numBases++;
+                            //
+                        }
+                    }
+
+                    tileMapA.SetTile(curPos, arena);
                     tileCount++;
                     tileGrid[curPos.x, curPos.y] = Grid.ARENA;
                     hasCreatedFloor = true;
@@ -127,10 +143,9 @@ public class ArenaGenerationBehavior : MonoBehaviour
             {
                 yield return new WaitForSeconds(waitTimer);
             }
-
-            StartCoroutine(CreateWalls());
-
         }
+        StartCoroutine(CreateWalls());
+        StartCoroutine(Start());
     }
 
 
@@ -146,25 +161,25 @@ public class ArenaGenerationBehavior : MonoBehaviour
 
                     if (tileGrid[x + 1, y] == Grid.EMPTY)
                     {
-                        tileMap.SetTile(new Vector3Int(x + 1, y, 0), wall);
+                        tileMapW.SetTile(new Vector3Int(x + 1, y, 0), wall);
                         tileGrid[x + 1, y] = Grid.WALL;
                         hasCreatedWalll = true;
                     }
                     if (tileGrid[x - 1, y] == Grid.EMPTY)
                     {
-                        tileMap.SetTile(new Vector3Int(x - 1, y, 0), wall);
+                        tileMapW.SetTile(new Vector3Int(x - 1, y, 0), wall);
                         tileGrid[x - 1, y] = Grid.WALL;
                         hasCreatedWalll = true;
                     }
                     if (tileGrid[x, y + 1] == Grid.EMPTY)
                     {
-                        tileMap.SetTile(new Vector3Int(x, y + 1, 0), wall);
+                        tileMapW.SetTile(new Vector3Int(x, y + 1, 0), wall);
                         tileGrid[x, y + 1] = Grid.WALL;
                         hasCreatedWalll = true;
                     }
                     if (tileGrid[x, y - 1]  == Grid.EMPTY)
                     {
-                        tileMap.SetTile(new Vector3Int(x, y - 1, 0), wall);
+                        tileMapW.SetTile(new Vector3Int(x, y - 1, 0), wall);
                         tileGrid[x, y - 1] = Grid.WALL;
                         hasCreatedWalll = true;
                     }
@@ -173,7 +188,7 @@ public class ArenaGenerationBehavior : MonoBehaviour
                     {
                         yield return new WaitForSeconds(waitTimer);
                     }
-
+                    Debug.Log($"{x}, {y}");
                 }
             }
         }
@@ -222,6 +237,27 @@ public class ArenaGenerationBehavior : MonoBehaviour
         }
     }
 
+    Vector2 GetDirection()
+    {
+
+        int choice = Mathf.FloorToInt(UnityEngine.Random.value * 3.99f);
+
+        switch (choice)
+        {
+            case 0:
+                return Vector2.down;
+            case 1:
+                return Vector2.left;
+            case 2:
+                return Vector2.up;
+            case 3:
+                return Vector2.right;
+            default:
+                return Vector2.zero;
+
+        }
+    }
+
     void UpdatePos()
     {
 
@@ -233,6 +269,15 @@ public class ArenaGenerationBehavior : MonoBehaviour
             foundWalker.pos.y = Mathf.Clamp(foundWalker.pos.y, 1, tileGrid.GetLength(1) - 2);
             walkers[i] = foundWalker;
         }
+    }
 
+    bool ValidDistance(Vector3 posToCheck)
+    {
+        foreach (GameObject b in activeBases)
+        {
+            if (Vector3.Distance(b.transform.position, posToCheck) <= baseSpawnMinDist)
+                return false;
+        }
+        return true;
     }
 }

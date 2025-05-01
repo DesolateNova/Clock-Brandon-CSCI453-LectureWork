@@ -28,7 +28,6 @@ public class BillionsBehavior : MonoBehaviour
 
     private bool atWaypoint;
     private bool firstMove;
-    private bool atBoundary;
 
 
     private Transform myPos;
@@ -39,6 +38,8 @@ public class BillionsBehavior : MonoBehaviour
     public float currentHealth;
     private GameObject healthObject;
     private GameObject turretHardpoint;
+
+    private bool hitWall = false;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -54,7 +55,6 @@ public class BillionsBehavior : MonoBehaviour
         healthObject = transform.GetChild(0).gameObject;
         turretHardpoint = transform.GetChild(1).gameObject;
         currentHealth = maxHealth;
-        atBoundary = false;
         fTimer = fireRate;
 
         MAXRANK = 10;
@@ -179,15 +179,16 @@ public class BillionsBehavior : MonoBehaviour
 
     private void MoveTowards(GameObject location)
     {
+
+        if (hitWall)
+            return;
+
         float angle = Mathf.Atan2(location.transform.position.x, location.transform.position.y) * Mathf.Rad2Deg - 90;
         Vector3 direction = GameManager.GetDirectionTowards(location, gameObject).normalized;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
 
         if (!firstMove && !atWaypoint)
             velocityGain += Time.deltaTime;
-
-        if (atBoundary)
-            return;
 
 
         if (velocityGain / timeToMaxVelocity > 1f)
@@ -221,18 +222,25 @@ public class BillionsBehavior : MonoBehaviour
         if (waypoint == null)
             return;
 
-        if (other.gameObject.name == "Border Wall")
+        if (other.gameObject.CompareTag("Wall"))
         {
-            if (atBoundary)
-                transform.position += new Vector3(0, 0, 0);
-            else
-                atBoundary = true;
+            Vector3 moveDir = waypoint.transform.position - myPos.position;
+            transform.position -= (-moveDir.normalized * float.Epsilon) * Time.deltaTime;
+            hitWall = true;
         }
 
         if (other.CompareTag("Spawnling"))
         {
             BillionsBehavior otherBillion = other.GetComponent<BillionsBehavior>();
             atWaypoint = otherBillion.atWaypoint;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Wall"))
+        {
+            hitWall = false;
         }
     }
 
@@ -248,25 +256,20 @@ public class BillionsBehavior : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        if(other.gameObject.name == "Border Wall")
+        if (other.gameObject.CompareTag("Wall"))
         {
-            float lockYAxis = Mathf.Abs(waypoint.transform.position.y) - Mathf.Abs(transform.position.y);
-            float lockXAxis = Mathf.Abs(waypoint.transform.position.x) - Mathf.Abs(transform.position.x);
-            float lockedAxis = Mathf.Max(lockYAxis, lockXAxis);
-
-            if (lockedAxis == lockYAxis)
-                transform.position += new Vector3(transform.position.x, 0, transform.position.z) * Time.deltaTime;
-            else if (lockedAxis == lockXAxis)
-                transform.position += new Vector3(0, transform.position.y, transform.position.z) * Time.deltaTime;
-            else if (lockedAxis == lockYAxis)
-                transform.position += transform.position * Time.deltaTime;
+            Vector3 centerDir = GameObject.Find("Arena Center").transform.position - transform.position;
+            
+            if (waypoint != null)
+            {
+                Vector3 moveDir = waypoint.transform.position - myPos.position;
+                transform.position -= (-moveDir.normalized * float.Epsilon) * Time.deltaTime;
+            }
+            else
+                transform.position += other.bounds.ClosestPoint(centerDir).normalized;
+                
+            hitWall = true;
         }
-    }
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.gameObject.name == "Border Walls")
-            atBoundary = false;
     }
 
 }

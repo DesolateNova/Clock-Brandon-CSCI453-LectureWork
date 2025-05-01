@@ -235,9 +235,9 @@ MonoBehaviour:
   spawnling: {fileID: 523395270831460946, guid: e73c46c2027557545b11eff56cbe2f1d, type: 3}
   spawnTime: 2.5
   fireRate: 5
-  range: 12
+  range: 3
   projectile: {fileID: 3054855772672660894, guid: 4721daea826bbec4d81f343463e3ec1a, type: 3}
-  MAXHEALTH: 0
+  MAXHEALTH: 500
   currentExp: 0
   expValue: 250
 --- !u!50 &5058708377847871905

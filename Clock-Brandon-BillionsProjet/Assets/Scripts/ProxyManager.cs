@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class ProxyManager :  MonoBehaviour {
 
@@ -7,7 +8,7 @@ public class ProxyManager :  MonoBehaviour {
 
     public static Dictionary<string, LinkedList<GameObject>> relevantObjects = new Dictionary<string, LinkedList<GameObject>>();
     public static Dictionary<string, LinkedList<GameObject>> worldSpawnlings = new Dictionary<string, LinkedList<GameObject>>();
-    private static BaseBehavior[] startingBases;
+    public static List<BaseBehavior> startingBases;
     public void Awake()
     {
         if (instance != null && instance != this)
@@ -21,7 +22,7 @@ public class ProxyManager :  MonoBehaviour {
 
     public void Start()
     {
-        startingBases = GameObject.FindObjectsByType<BaseBehavior>(FindObjectsSortMode.None);
+        startingBases = new List<BaseBehavior>(FindObjectsByType<BaseBehavior>(FindObjectsSortMode.None));
 
         foreach (BaseBehavior b in startingBases)
         {

@@ -3,6 +3,7 @@ using UnityEngine.Events;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class BaseBehavior : MonoBehaviour
 {
@@ -38,18 +39,45 @@ public class BaseBehavior : MonoBehaviour
     [SerializeField] public float expValue;
 
 
+    int cycles;
 
+    void Awake()
+    {
+
+        cycles = 0;
+        //
+        if (name.Contains("(Clone)"))
+        {
+            int cloneLen = "(Clone)".Length;
+            name = name.Remove(name.Length - cloneLen, "(Clone)".Length);
+        }
+        if (GameObject.Find("MapGenerator"))
+            gameObject.SetActive(false);
+        //
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        StartCoroutine(Loading());
+        Debug.Log($"Done in {cycles} cycles");
+
         //Get relevant data for variables
         baseColor = GameManager.GetColor(gameObject);
         timer = spawnTime;
         fTimer = fireRate;
 
         //Angle Base towards center of arena
-        arenaCenterPos = GameManager.arenaCenter.transform.position - transform.position;
+        try
+        {
+            arenaCenterPos = GameManager.arenaCenter.transform.position - transform.position;
+        }
+        catch
+        {
+            arenaCenterPos = GameObject.Find("Arena Center").transform.position - transform.position;
+        }
+
+
         float angle = Mathf.Atan2(arenaCenterPos.y, arenaCenterPos.x) * Mathf.Rad2Deg - 90;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
         radius = GetRadius(gameObject);
@@ -155,6 +183,7 @@ public class BaseBehavior : MonoBehaviour
         {
             ProxyManager.worldSpawnlings[baseColor].Remove(gameObject);
             ProxyManager.relevantObjects[baseColor].Remove(gameObject);
+            ProxyManager.startingBases.Remove(this);
             Destroy(gameObject);
         }
     }
@@ -186,4 +215,9 @@ public class BaseBehavior : MonoBehaviour
         return 0;
     }
 
+    IEnumerator Loading()
+    {
+        Debug.Log(ArenaGenerationBehavior.isLoaded);
+        yield return new WaitUntil(() => ArenaGenerationBehavior.isLoaded);
+    }
 }
