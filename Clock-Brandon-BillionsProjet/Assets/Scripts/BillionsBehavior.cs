@@ -40,6 +40,7 @@ public class BillionsBehavior : MonoBehaviour
     private GameObject turretHardpoint;
 
     private bool hitWall = false;
+    private Rigidbody2D rb;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -61,6 +62,7 @@ public class BillionsBehavior : MonoBehaviour
         rank = BaseBehavior.GetRank(color);
         rankGameObject = transform.GetChild(2).gameObject;
         rankImage = rankGameObject.transform.GetChild(0).GetComponent<Image>();
+        rb = GetComponent<Rigidbody2D>();
 
     }
 
@@ -100,6 +102,11 @@ public class BillionsBehavior : MonoBehaviour
             ProxyManager.worldSpawnlings[color].Remove(gameObject);
             Destroy(gameObject);
         }
+    }
+
+    private void FixedUpdate()
+    {
+        
     }
 
     private void PositionAdjuster()
@@ -179,35 +186,33 @@ public class BillionsBehavior : MonoBehaviour
 
     private void MoveTowards(GameObject location)
     {
+        Vector3 targetPos = location.transform.position;
+        Vector3 direction = (targetPos - myPos.position).normalized;
 
-        if (hitWall)
-            return;
+        // Rotate to face the target
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+        transform.rotation = Quaternion.Euler(0, 0, angle);
 
-        float angle = Mathf.Atan2(location.transform.position.x, location.transform.position.y) * Mathf.Rad2Deg - 90;
-        Vector3 direction = GameManager.GetDirectionTowards(location, gameObject).normalized;
-        transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        float distance = Vector3.Distance(targetPos, myPos.position);
+        float maxDistance = billionRadius * 6f;
 
-        if (!firstMove && !atWaypoint)
-            velocityGain += Time.deltaTime;
+        // Acceleration/deceleration curve (0 to 1)
+        float speedFactor = 1f + Mathf.Clamp01(distance / maxDistance);
 
-
-        if (velocityGain / timeToMaxVelocity > 1f)
-            currentVelocity = 1f;
-        else if (velocityGain / timeToMaxVelocity > initialVelocity)
-            currentVelocity = velocityGain / timeToMaxVelocity;
-        else
-            currentVelocity = initialVelocity;
-
-        if (Vector3.Distance(location.transform.position, myPos.position) > billionRadius)
-            transform.position += direction * (Time.deltaTime * movementSpeed * currentVelocity);
-
-
-        else if (Vector3.Distance(location.transform.position, myPos.position) < billionRadius)
+        // Smooth acceleration to max speed
+        if (!firstMove)
         {
-            waypoint.MakePackLeader(gameObject);
-            velocityGain = 0f;
-            atWaypoint = true;
+            velocityGain += Time.deltaTime;
+            velocityGain = Mathf.Clamp(velocityGain, 0f, timeToMaxVelocity);
         }
+
+        float velocityProgress = velocityGain / timeToMaxVelocity;
+        currentVelocity = Mathf.Lerp(initialVelocity, 1f, velocityProgress);
+
+        float finalSpeed = speedFactor * currentVelocity * movementSpeed;
+        rb.linearVelocity = direction * finalSpeed;
+        Debug.Log($"{speedFactor} * {currentVelocity} * {movementSpeed}");
+
         firstMove = false;
     }
 
@@ -225,8 +230,8 @@ public class BillionsBehavior : MonoBehaviour
         if (other.gameObject.CompareTag("Wall"))
         {
             Vector3 moveDir = waypoint.transform.position - myPos.position;
-            transform.position -= (-moveDir.normalized * float.Epsilon) * Time.deltaTime;
-            hitWall = true;
+            //transform.position -= (-moveDir.normalized * float.Epsilon) * Time.deltaTime;
+            //hitWall = true;
         }
 
         if (other.CompareTag("Spawnling"))
@@ -240,7 +245,7 @@ public class BillionsBehavior : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Wall"))
         {
-            hitWall = false;
+            //hitWall = false;
         }
     }
 
@@ -263,12 +268,12 @@ public class BillionsBehavior : MonoBehaviour
             if (waypoint != null)
             {
                 Vector3 moveDir = waypoint.transform.position - myPos.position;
-                transform.position -= (-moveDir.normalized * float.Epsilon) * Time.deltaTime;
+                //transform.position -= (-moveDir.normalized * float.Epsilon) * Time.deltaTime;
             }
-            else
-                transform.position += other.bounds.ClosestPoint(centerDir).normalized;
+            //else
+                //transform.position += other.bounds.ClosestPoint(centerDir).normalized;
                 
-            hitWall = true;
+            //hitWall = true;
         }
     }
 

@@ -263,7 +263,7 @@ MonoBehaviour:
   expToLevel: 0
   rank: 0
   curHealth: 0
-  reserves: 7
+  reserves: 0
   spawnling: {fileID: 523395270831460946, guid: e73c46c2027557545b11eff56cbe2f1d, type: 3}
   spawnTime: 2.5
   fireRate: 5
